@@ -414,9 +414,11 @@ const Agent = () => {
     });
 
     newSocket.on("new_message", (message) => {
+      console.log("🔔 RECEIVED NEW MESSAGE EVENT:", message);
       debugLog("RECEIVED NEW MESSAGE:", message);
       
       if (!message || !message.roomId) {
+        console.error("❌ ERROR: Invalid message format, missing roomId", message);
         debugLog("ERROR: Invalid message format, missing roomId", message);
         return;
       }
@@ -424,14 +426,17 @@ const Agent = () => {
       // Ensure the message has a valid role
       if (!message.role) {
         message.role = message.senderId === newSocket.id ? "agent" : "user";
+        console.log(`🔄 Assigned role: ${message.role} for message`);
         debugLog("Assigned role:", message.role);
       }
       
       // Log comparison of roomIds for debugging
+      console.log(`🔍 Message roomId: ${message.roomId}, Active room: ${activeRoom?.id}, Match: ${message.roomId === activeRoom?.id}`);
       debugLog(`Message roomId: ${message.roomId}, Active room: ${activeRoom?.id}`);
       
       // Add message to chat if this is for our active room
       if (activeRoom && message.roomId === activeRoom.id) {
+        console.log("📝 Adding message to active chat");
         debugLog("Adding message to active chat");
         
         // Check for duplicates before adding
@@ -442,10 +447,12 @@ const Agent = () => {
           );
           
           if (duplicate) {
+            console.log("⚠️ Skipping duplicate message");
             debugLog("Skipping duplicate message");
             return prev;
           }
           
+          console.log("✅ Added message to messages state");
           debugLog("Added message to messages state");
           return [...prev, message];
         });
@@ -460,6 +467,7 @@ const Agent = () => {
       }
       
       // Important: ALWAYS update the sidebar regardless of active room
+      console.log("🔄 Updating sidebar for message:", message.content?.substring(0, 20));
       debugLog("Updating room in sidebar for message:", message.content?.substring(0, 20));
       
       const msgRoomId = message.roomId;
@@ -470,6 +478,7 @@ const Agent = () => {
         // Check if room exists in our list
         const roomExists = prev.some(room => room.id === msgRoomId);
         debugLog(`Room ${msgRoomId} exists in allRooms: ${roomExists}`);
+        console.log(`🔍 Room ${msgRoomId} exists in allRooms: ${roomExists}`);
         
         let updated;
         if (roomExists) {
@@ -483,6 +492,7 @@ const Agent = () => {
                 unread: activeRoom?.id !== msgRoomId
               };
               debugLog("Updated room in allRooms:", room.id);
+              console.log("✅ Updated room in allRooms:", room.id);
               return newState;
             }
             return room;
@@ -490,6 +500,7 @@ const Agent = () => {
         } else {
           // Room doesn't exist yet, create a placeholder until we get full room data
           debugLog("Room not found in allRooms, creating placeholder");
+          console.log("🆕 Room not found in allRooms, creating placeholder");
           const newRoom = {
             id: msgRoomId,
             userName: message.senderName || "User",
@@ -509,6 +520,7 @@ const Agent = () => {
         // Check if the room exists
         const roomExists = prev.some(room => room.id === msgRoomId);
         debugLog(`Room ${msgRoomId} exists in availableRooms: ${roomExists}`);
+        console.log(`🔍 Room ${msgRoomId} exists in availableRooms: ${roomExists}`);
         
         let updated;
         if (roomExists) {
@@ -522,6 +534,7 @@ const Agent = () => {
                 unread: activeRoom?.id !== msgRoomId
               };
               debugLog("Updated room in availableRooms:", room.id);
+              console.log("✅ Updated room in availableRooms:", room.id);
               return newState;
             }
             return room;
@@ -531,6 +544,7 @@ const Agent = () => {
           const isActiveRoom = activeRoom?.id === msgRoomId;
           if (!isActiveRoom) {
             debugLog("Room not found in availableRooms, creating placeholder");
+            console.log("🆕 Room not found in availableRooms, creating placeholder");
             const newRoom = {
               id: msgRoomId,
               userName: message.senderName || "User",
@@ -550,18 +564,37 @@ const Agent = () => {
       
       // Always play notification for incoming user messages
       if (message.role === 'user' && message.senderId !== newSocket.id) {
-        debugLog("Playing notification sound for incoming message");
-        playNotificationSound();
+        console.log("🔊 Playing notification sound for user message");
+        debugLog("Playing notification for message from:", message.senderId);
         
-        // Show browser notification
-        if (Notification.permission === "granted" && notificationsEnabled) {
+        // Play sound for all messages not from current user
+        if (notificationSound) {
           try {
-            new Notification("New Message", {
-              body: `${message.senderName || "Customer"}: ${message.content?.substring(0, 50)}...`,
-              icon: logo
+            notificationSound.play().catch(err => {
+              console.warn("Failed to play notification sound:", err);
             });
-          } catch (e) {
-            debugLog("Error showing notification:", e);
+          } catch (err) {
+            console.warn("Error playing notification sound:", err);
+          }
+        }
+        
+        // Show browser notification if we have permission and window is not focused
+        if (Notification.permission === "granted" && !document.hasFocus()) {
+          try {
+            const notification = new Notification("New Message", {
+              body: `${message.senderName || 'User'}: ${message.content?.substring(0, 60)}...`,
+              icon: "/favicon.ico",
+            });
+            
+            notification.onclick = () => {
+              window.focus();
+              notification.close();
+            };
+            
+            debugLog("Browser notification shown for message");
+            console.log("🔔 Browser notification shown");
+          } catch (err) {
+            console.warn("Failed to show notification:", err);
           }
         }
       }

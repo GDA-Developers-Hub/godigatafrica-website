@@ -71,16 +71,14 @@ const userSockets = new Map(); // Map of user socket IDs to user info
 // Constants
 const RECENT_CONVERSATION_LIMIT = 10 * 60 * 1000; // 10 minutes in milliseconds
 
-// Helper function to notify all active agents
-const notifyAllAgents = (eventName, data) => {
-  for (const [agentSocketId, _] of activeAgents.entries()) {
-    io.to(agentSocketId).emit(eventName, data);
-  }
-};
-
 // Helper function to notify all agents about an updated room
 const notifyRoomUpdate = (room) => {
+  console.log(`[DEBUG] Notifying all agents about updated room: ${room.id}`);
+  console.log(`[DEBUG] Room data: ${JSON.stringify(room)}`);
+  let notifiedCount = 0;
+  
   for (const [agentSocketId, _] of activeAgents.entries()) {
+    console.log(`[DEBUG] Sending room_updated to agent: ${agentSocketId}`);
     io.to(agentSocketId).emit("room_updated", {
       id: room.id,
       userName: room.userName,
@@ -89,7 +87,10 @@ const notifyRoomUpdate = (room) => {
       lastActivityTimestamp: room.lastActivityTimestamp,
       unread: room.unread
     });
+    notifiedCount++;
   }
+  
+  console.log(`[DEBUG] Notified ${notifiedCount} agents about room update`);
 };
 
 // Load existing rooms from database
@@ -684,12 +685,16 @@ io.on("connection", (socket) => {
   socket.on("send_message", async (message) => {
     const { roomId, role, content, senderId, senderName } = message;
     
+    console.log(`[DEBUG] Message received: ${JSON.stringify(message)}`);
+    
     if (!roomId || !content) {
+      console.log("[DEBUG] Missing roomId or content, ignoring message");
       return;
     }
     
     const room = chatRooms.get(roomId);
     if (!room) {
+      console.log(`[DEBUG] Room ${roomId} not found in chatRooms Map`);
       return;
     }
     
@@ -702,6 +707,7 @@ io.on("connection", (socket) => {
       // Set unread flag if the message is from a user and sent to a room with an agent
       if (role === 'user' && room.assignedAgentId) {
         room.unread = true;
+        console.log(`[DEBUG] Marking room ${roomId} as unread for agent`);
       }
       
       // Add message to database
@@ -726,24 +732,25 @@ io.on("connection", (socket) => {
         [content.substring(0, 255), roomId] // Limit message length to avoid DB issues
       );
       
-      console.log(`Sending message to room ${roomId}: ${content.substring(0, 30)}...`);
+      console.log(`[DEBUG] Sending message to room ${roomId}: ${content.substring(0, 30)}...`);
       
       // First broadcast directly to the room
+      console.log(`[DEBUG] Broadcasting to room: ${roomId}`);
       io.to(roomId).emit("new_message", message);
       
       // Then explicitly send to agent if one is assigned
       if (room.assignedAgentId) {
-        console.log(`Explicitly sending message to agent: ${room.assignedAgentId}`);
+        console.log(`[DEBUG] Explicitly sending message to agent: ${room.assignedAgentId}`);
         io.to(room.assignedAgentId).emit("new_message", message);
       }
       
       // Also send to the user if not from the user
       if (role !== 'user' && room.userSocketId) {
-        console.log(`Explicitly sending message to user: ${room.userSocketId}`);
+        console.log(`[DEBUG] Explicitly sending message to user: ${room.userSocketId}`);
         io.to(room.userSocketId).emit("new_message", message);
       }
       
-      console.log(`Message sent in room ${roomId} by ${role}: ${content.substring(0, 30)}...`);
+      console.log(`[DEBUG] Message sent in room ${roomId} by ${role}: ${content.substring(0, 30)}...`);
 
       // Notify all agents about the updated room for sidebar updates
       const roomData = {
@@ -756,13 +763,18 @@ io.on("connection", (socket) => {
       };
       
       // Send room_updated to all agents
+      console.log(`[DEBUG] Sending room_updated to all agents (count: ${activeAgents.size})`);
+      let notifiedCount = 0;
       for (const [agentSocketId, _] of activeAgents.entries()) {
-        console.log(`Sending room update to agent: ${agentSocketId}`);
+        console.log(`[DEBUG] Sending room update to agent: ${agentSocketId}`);
         io.to(agentSocketId).emit("room_updated", roomData);
+        notifiedCount++;
       }
+      console.log(`[DEBUG] Sent room_updated to ${notifiedCount} agents`);
       
       // If it's a user message and sent to a room with an agent, send notification
       if (role === 'user' && room.assignedAgentId) {
+        console.log(`[DEBUG] Sending agent_notification to agent: ${room.assignedAgentId}`);
         io.to(room.assignedAgentId).emit("agent_notification", {
           type: 'new_message',
           message: `New message from ${senderName || "User"} in room ${roomId.slice(0, 8)}...`,
@@ -772,9 +784,10 @@ io.on("connection", (socket) => {
       }
       
       // Also update available rooms for all agents to ensure sidebar reflects changes
+      console.log(`[DEBUG] Updating available rooms for all agents`);
       updateAvailableRoomsForAllAgents();
     } catch (error) {
-      console.error("Error sending message:", error);
+      console.error("[DEBUG] Error sending message:", error);
     }
   });
 
