@@ -67,6 +67,7 @@ CORS_ALLOW_CREDENTIALS = True
 
 # Allow requests from your React frontend (Update this with your frontend URL)
 CSRF_TRUSTED_ORIGINS = [
+    "https://godigatafrica-website-production.up.railway.app",
     "https://go-digital-africa-production.up.railway.app",
     "http://hostingwithgda.com",
     "https://hostingwithgda.com",
