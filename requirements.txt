@@ -47,6 +47,8 @@ django-redis
 
 validators
 
+mysqlclient
+
 
 
 
