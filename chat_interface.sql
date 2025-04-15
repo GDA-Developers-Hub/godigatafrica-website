@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `admins` (
 
 -- Create default super admin (password: Admin@123)
 INSERT INTO `admins` (`username`, `email`, `password`, `role`) 
-VALUES ('Super Admin', 'admin@example.com', '$2a$10$IzkzYQpQVL6QY1G3vqh4WuXwgHKXvt2TBkWQjqhEj9Odcjw2DKVgK', 'superadmin');
+VALUES ('Super Admin', 'admin@example.com', '   $2b$10$VCrs8Y5yWc16SKJkU2xwo.TiyUC7WPle98IKr5KaK1FRtLqF2mE9', 'superadmin');
 
 -- New tables for agent chat system
 CREATE TABLE IF NOT EXISTS `agents` (

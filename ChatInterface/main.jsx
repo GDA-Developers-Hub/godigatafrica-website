@@ -9,7 +9,7 @@ import AgentDashboard from "./App/AgentDashboard.jsx";
 import AdminLogin from "./App/AdminLogin.jsx";
 import AgentRoute from "./Components/AgentRoute.jsx";
 import AdminRoute from "./Components/AdminRoute.jsx";
-import { AgentAuthProvider } from "./Auth/AgentAuthContext.jsx";
+import { AgentAuthProvider } from "./Contexts/AgentAuthContext.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(

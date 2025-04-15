@@ -50,9 +50,12 @@ const AgentLogin = () => {
     console.log("AgentLogin: Login result:", result);
 
     if (result.success) {
-      // Redirect to agent dashboard on successful login
-      console.log("AgentLogin: Login successful, redirecting to dashboard");
-      navigate("/agent");
+      // Add a small delay before redirecting to prevent navigation throttling
+      console.log("AgentLogin: Login successful, waiting briefly before redirecting");
+      setTimeout(() => {
+        console.log("AgentLogin: Now redirecting to dashboard");
+        navigate("/agent");
+      }, 1000); // 1000ms delay (1 second)
     } else {
       console.log("AgentLogin: Login failed:", result.error);
       setError(result.error || "Login failed. Please check your credentials.");
@@ -105,6 +108,7 @@ const AgentLogin = () => {
                     onChange={onChange}
                     placeholder="you@example.com"
                     required
+                    autocomplete="email"
                   />
                 </div>
               </div>
@@ -127,6 +131,7 @@ const AgentLogin = () => {
                     onChange={onChange}
                     placeholder="••••••••"
                     required
+                    autocomplete="current-password"
                   />
                 </div>
               </div>
