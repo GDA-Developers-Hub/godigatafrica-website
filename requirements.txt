@@ -49,6 +49,8 @@ validators
 
 mysqlclient
 
+mysqlclient==2.2.7
+drf-yasg==1.21.10
 
 
 
