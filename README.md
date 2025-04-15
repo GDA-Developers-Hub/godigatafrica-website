@@ -1,4 +1,3 @@
-```md
 # 🌍 GoDigitAfrica Website
 
 Welcome to the **official monorepo** for the [GoDigitAfrica](https://godigatafrica.com) platform – empowering digital transformation across Africa. This repository contains all the core services of the website:
