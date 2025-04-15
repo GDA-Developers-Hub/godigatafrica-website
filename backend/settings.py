@@ -141,16 +141,24 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'hostwithus_django_project',
+#         'USER': 'hostwithus_website',
+#         'PASSWORD': 'GDAKenyaDevelopers',
+#         'HOST': 'localhost',  # Or use your actual hosting IP if needed
+#         'PORT': '3306',
+#     }
+# }
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'hostwithus_django_project',
-        'USER': 'hostwithus_website',
-        'PASSWORD': 'GDAKenyaDevelopers',
-        'HOST': 'localhost',  # Or use your actual hosting IP if needed
-        'PORT': '3306',
-    }
+    "default": dj_database_url.parse(
+        "postgresql://postgres:IGuIbWrFvPlfzzsScWqbepPsyAKQPwWQ@shortline.proxy.rlwy.net:38672/railway", conn_max_age=600, ssl_require=True
+    )
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
