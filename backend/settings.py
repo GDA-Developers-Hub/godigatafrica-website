@@ -83,8 +83,10 @@ CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
 CORS_ALLOW_HEADERS = ["*"]
 
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5174",
     "https://hostingwithgda.com",
     "http://hostingwithgda.com/website/",
+    "https://godigatafrica-website-production.up.railway.app",
 ]
 
 
