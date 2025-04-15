@@ -50,6 +50,7 @@ logger = logging.getLogger(__name__)
 
 
 ALLOWED_HOSTS = [
+    'godigatafrica-website-production.up.railway.app',
     'server-628309.hostingwithgda.com', 
     '127.0.0.1', 
     'localhost', 
@@ -278,9 +279,8 @@ FORCE_SCRIPT_NAME = '/django'
 STATIC_URL = '/django/static/'
 
 # Frontend URL
-FRONTEND_URL = "https://godigital-africa.web.app"
+FRONTEND_URL = "https://hostingwithgda.com/website/"
 
-  
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
