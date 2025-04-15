@@ -9,7 +9,7 @@ def create_super_admin(sender, **kwargs):
     if not User.objects.filter(is_super_admin=True).exists():
         User.objects.create_superuser(
             username="admin",
-            email="admin@example.com",
+            email="admin@godigitalafrica.com",
             password="Admin@1234",
             is_super_admin=True
         )
