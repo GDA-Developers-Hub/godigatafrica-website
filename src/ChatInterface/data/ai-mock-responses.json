@@ -1,0 +1,234 @@
+{
+  "general": {
+    "greeting": [
+      "Hello! Welcome to Go Digital Africa. How can I assist you today?",
+      "Hi there! I'm Go Digital Africa's virtual assistant. What information are you looking for?",
+      "Greetings! Thanks for reaching out to Go Digital Africa. How may I help you?"
+    ],
+    "thanks": [
+      "You're welcome! Is there anything else I can help you with?",
+      "My pleasure! Feel free to ask if you need any other information.",
+      "Happy to help! Don't hesitate to reach out if you have more questions."
+    ],
+    "offline": [
+      "I'm currently operating in offline mode, but I can still answer many questions about Go Digital Africa.",
+      "While we're offline at the moment, I can provide you with basic information about our services and company.",
+      "I'm running in offline mode right now, but I'm still here to help with information about Go Digital Africa."
+    ],
+    "fallback": [
+      "I don't have specific information on that topic at the moment. Could you try asking something about our services, company, or contact information?",
+      "I'm not sure I understand your question fully. Could you rephrase it or ask about our services, projects, or company details?",
+      "I don't have enough information to answer that properly. Feel free to ask about our digital services, company, or how to get in touch with us."
+    ]
+  },
+  "company": {
+    "about": [
+      "Go Digital Africa is a leading digital transformation agency specializing in web development, mobile apps, and digital marketing services tailored for businesses across Africa.",
+      "We are Go Digital Africa, an innovative digital agency committed to helping African businesses establish and enhance their online presence through cutting-edge technology solutions.",
+      "Go Digital Africa provides comprehensive digital solutions including web and mobile development, digital marketing, and IT consulting, with a special focus on empowering African businesses in the digital landscape."
+    ],
+    "mission": [
+      "Our mission is to bridge the digital divide in Africa by providing accessible, high-quality digital solutions that help businesses compete effectively in the global marketplace.",
+      "Go Digital Africa is committed to empowering African businesses through technology, making digital transformation accessible and impactful for organizations of all sizes.",
+      "We aim to be the catalyst for digital innovation across Africa, providing solutions that are not just technologically advanced but also culturally relevant and accessible."
+    ],
+    "vision": [
+      "Our vision is an Africa where businesses leverage digital technology to reach their full potential and contribute to the continent's economic growth.",
+      "We envision a digitally transformed Africa where businesses harness the power of technology to overcome challenges and seize global opportunities.",
+      "Go Digital Africa strives to be at the forefront of Africa's digital revolution, setting new standards for innovation and excellence in digital services."
+    ],
+    "values": [
+      "Our core values include innovation, excellence, integrity, cultural sensitivity, and commitment to Africa's digital growth and development.",
+      "We value innovation, customer-centricity, ethical practices, continuous learning, and a deep commitment to Africa's digital empowerment.",
+      "At Go Digital Africa, we believe in excellence, integrity, collaboration, innovation, and making a positive impact through technology."
+    ],
+    "history": [
+      "Go Digital Africa was founded in 2015 by a group of tech enthusiasts passionate about leveraging digital solutions to address uniquely African challenges and opportunities.",
+      "Established in 2015, Go Digital Africa began as a small web development firm and has since grown into a comprehensive digital agency serving clients across the continent.",
+      "Our journey began in 2015 with a vision to transform how African businesses approach digital technology. From humble beginnings, we've grown to become a trusted digital partner for organizations throughout Africa."
+    ]
+  },
+  "leadership": {
+  "ceo": [
+    "Abass Mohamed, the founder of Go Digital Africa, brings extensive experience in technology and business development across Africa and internationally.",
+    "Go Digital Africa is led by Abass Mohamed, a visionary leader with deep expertise in digital transformation and a passion for African technological advancement.",
+    "Abass Mohamed, our founder, has a background in computer science and business administration, with a PhD focused on digital innovation in emerging markets.",
+    "Martin Okonji, our co-founder, complements the team with strong experience in strategic operations and grassroots tech initiatives across East Africa."
+  ],
+    "team": [
+      "Our leadership team consists of experienced professionals in technology, marketing, and business development, all committed to delivering exceptional digital solutions for Africa.",
+      "Go Digital Africa's management team brings together diverse expertise in software development, digital marketing, project management, and business strategy.",
+      "We're proud of our diverse leadership team, which includes top talent from across Africa with backgrounds in technology, marketing, design, and business development."
+    ]
+  },
+  "services": {
+    "web_development": [
+      "Our web development services include responsive website design, e-commerce platforms, web applications, content management systems, and custom web solutions tailored to your business needs.",
+      "We create modern, responsive, and user-friendly websites optimized for performance and conversion, ranging from simple corporate sites to complex web applications.",
+      "Our web development team specializes in creating custom websites and web applications that are responsive, secure, and scalable, using the latest technologies and best practices."
+    ],
+    "mobile_development": [
+      "We develop native and cross-platform mobile applications for iOS and Android, helping businesses engage with customers through intuitive and feature-rich mobile experiences.",
+      "Our mobile app development services cover the entire development lifecycle from concept to deployment, for both Android and iOS platforms.",
+      "We specialize in creating user-friendly, high-performance mobile applications that help businesses connect with their customers on smartphones and tablets."
+    ],
+    "digital_marketing": [
+      "Our comprehensive digital marketing services include SEO, social media marketing, content marketing, email campaigns, PPC advertising, and analytics to boost your online visibility and drive growth.",
+      "We offer integrated digital marketing strategies tailored to the African market, helping businesses increase their online presence, engage with customers, and drive conversions.",
+      "Our digital marketing experts develop custom strategies combining SEO, content marketing, social media, and paid advertising to help you reach and engage your target audience."
+    ],
+    "seo": [
+      "Our SEO services focus on improving your website's visibility in search engine results through technical optimization, content strategy, and ethical link-building practices.",
+      "We help businesses rank higher in search engines through comprehensive SEO strategies that include keyword research, on-page optimization, technical SEO, and quality content creation.",
+      "Our SEO experts use data-driven approaches to improve your search engine rankings, increase organic traffic, and enhance your website's authority and relevance."
+    ],
+    "social_media": [
+      "We manage social media presence across platforms relevant to the African market, creating engaging content, building communities, and implementing targeted ad campaigns.",
+      "Our social media marketing services include strategy development, content creation, community management, paid advertising, and performance analytics across all major platforms.",
+      "We help businesses leverage social media to build brand awareness, engage with customers, and drive website traffic through strategic content and targeted campaigns."
+    ],
+    "content_marketing": [
+      "Our content marketing services include blog writing, article creation, infographics, videos, and other content forms designed to engage your audience and establish your business as an industry authority.",
+      "We create compelling, relevant content that resonates with African audiences, helps establish your brand authority, and drives organic traffic to your digital platforms.",
+      "Our content marketing team develops strategic content plans and creates high-quality, engaging content that attracts, informs, and converts your target audience."
+    ],
+    "ecommerce": [
+      "We develop and optimize e-commerce solutions that enable businesses to sell products and services online, from simple shops to complex marketplaces with secure payment processing.",
+      "Our e-commerce services include online store development, payment gateway integration, inventory management systems, and e-commerce marketing strategies.",
+      "We create customized e-commerce platforms that offer seamless shopping experiences, secure transactions, and effective inventory management for businesses across Africa."
+    ],
+    "it_consulting": [
+      "Our IT consulting services provide strategic guidance on digital transformation, technology selection, implementation strategies, and optimizing your digital infrastructure.",
+      "We offer expert advice on technology strategy, digital transformation roadmaps, system integration, and IT infrastructure optimization for African businesses.",
+      "Our IT consultants work with you to assess your technology needs, develop strategic plans, and implement solutions that drive efficiency and innovation in your business."
+    ]
+  },
+  "locations": {
+    "headquarters": [
+      "Our headquarters is located in Nairobi, Kenya, serving as our main hub for operations across East Africa.",
+      "Go Digital Africa's main office is in Nairobi, Kenya, at Business Park Tower, Westlands.",
+      "We're headquartered in Nairobi, Kenya, with our main office in the Westlands business district."
+    ],
+   "branches": [
+      "We have regional offices in Mogadishu (Somalia), Addis Ababa (Ethiopia), Nairobi (Kenya), Dubai (UAE), Kigali (Rwanda), Dar es Salaam (Tanzania), Dakar (Senegal), and Accra (Ghana), allowing us to serve clients across multiple regions.",
+      "Beyond our headquarters, we maintain branch offices in East Africa (Nairobi, Addis Ababa, Dar es Salaam, Kigali), West Africa (Dakar, Accra), and the Middle East (Dubai).",
+      "Go Digital Africa operates branch offices in key cities including Mogadishu, Addis Ababa, Nairobi, Dubai, Kigali, Dar es Salaam, Dakar, and Accra to provide localized support to our clients."
+    ],
+
+    "remote": [
+      "In addition to our physical offices, we have a distributed team of professionals working remotely across the continent, allowing us to tap into talent pools throughout Africa.",
+      "We embrace remote work, with team members collaborating digitally from various locations across Africa, supplementing our physical office presence.",
+      "Our team includes remote professionals based throughout Africa, enabling us to provide diverse perspectives and serve clients with local knowledge."
+    ]
+  },
+  "contact": {
+    "email": [
+      "You can reach our team via email at info@godigitalafrica.com for general inquiries or support@godigitalafrica.com for technical assistance.",
+      "Email us at info@godigitalafrica.com, and our team will respond to your inquiry within 24 hours.",
+      "For information and inquiries, please email us at info@godigitalafrica.com or send specific support questions to support@godigitalafrica.com."
+    ],
+    "phone": [
+      "You can call our main office at +254 20 5000 500 during business hours (Monday to Friday, 8:30 AM to 5:30 PM EAT).",
+      "Our customer service team is available by phone at +254 20 5000 500 on weekdays from 8:30 AM to 5:30 PM East Africa Time.",
+      "Feel free to call us at +254 20 5000 500 for direct assistance with your inquiries."
+    ],
+    "form": [
+      "Visit our website at www.godigitalafrica.com and fill out the contact form on our Contact page for a prompt response from our team.",
+      "The easiest way to reach us is through the contact form on our website, which routes your inquiry to the appropriate department.",
+      "Submit your inquiry through our website's contact form, and the relevant team member will get back to you promptly."
+    ],
+    "social": [
+      "Connect with us on social media: Facebook and Instagram (@GoDigitalAfrica), Twitter (@GoDigital_Africa), and LinkedIn (Go Digital Africa).",
+      "Follow us on social media platforms including LinkedIn, Twitter, Facebook, and Instagram for the latest updates and to connect with our team.",
+      "You can also reach out to us through our social media channels, where we actively engage with messages and comments."
+    ]
+  },
+  "pricing": {
+    "web_development": [
+      "Web development projects typically range from $1,000 for basic websites to $10,000+ for complex web applications, depending on your specific requirements.",
+      "Our website development packages start at $1,000 for a basic informational website, with e-commerce sites starting at $3,000 and custom web applications from $5,000.",
+      "Web development pricing varies based on complexity, with standard business websites from $1,500, e-commerce solutions from $3,500, and custom web applications starting at $5,000."
+    ],
+    "mobile_apps": [
+      "Mobile app development typically costs between $5,000 and $25,000+, depending on the complexity, features, and platforms (iOS/Android) required.",
+      "Our mobile app development starts at $5,000 for a basic app on a single platform, with more complex applications or multi-platform solutions ranging from $10,000 to $25,000+.",
+      "Mobile app pricing starts at $5,000 for simple applications, with more feature-rich apps ranging from $10,000 to $30,000 depending on complexity and platform requirements."
+    ],
+    "digital_marketing": [
+      "Our digital marketing packages range from $500 to $3,000 monthly, depending on the channels, strategy complexity, and campaign scale.",
+      "Digital marketing services start at $500 monthly for basic packages, with comprehensive multi-channel strategies ranging from $1,000 to $3,000+ monthly.",
+      "We offer digital marketing packages starting at $500 per month, with comprehensive strategies involving multiple channels typically ranging from $1,000 to $3,000 monthly."
+    ],
+    "seo": [
+      "SEO packages start at $350 monthly for basic optimization and can range up to $1,500+ for comprehensive search engine strategies.",
+      "Our SEO services range from $350 to $1,500+ monthly, depending on the competitiveness of your industry and the scope of optimization needed.",
+      "Basic SEO packages start at $350 per month, with more comprehensive packages for competitive industries ranging from $750 to $1,500+ monthly."
+    ],
+    "social_media": [
+      "Social media management services range from $300 to $1,200 monthly, depending on the number of platforms, posting frequency, and advertising budget.",
+      "Our social media packages start at $300 monthly for basic management of one platform, with multi-platform strategies ranging from $600 to $1,200+.",
+      "Social media management pricing starts at $300 monthly for single-platform management, with comprehensive multi-platform strategies ranging from $600 to $1,500."
+    ],
+    "custom": [
+      "We offer custom pricing based on your specific project requirements. Contact us for a personalized quote tailored to your business needs.",
+      "Each project is unique, so we provide custom quotations after understanding your specific requirements and objectives.",
+      "Our pricing is customized based on your specific needs, scope, and objectives. We'd be happy to provide a detailed quote after learning more about your project."
+    ]
+  },
+  "process": {
+    "web_development": [
+      "Our web development process includes discovery (requirements gathering), planning, design, development, testing, deployment, and post-launch support.",
+      "For web projects, we follow a structured process: initial consultation, proposal and scoping, UX/UI design, development, quality assurance, client review, deployment, and ongoing support.",
+      "Our web development methodology includes discovery and planning, wireframing and design, development, testing and quality assurance, client review and feedback, launch, and post-launch support."
+    ],
+    "mobile_development": [
+      "Mobile app development follows these stages: concept and planning, UI/UX design, development, testing, deployment to app stores, and ongoing maintenance.",
+      "Our mobile development process includes concept definition, wireframing, UI design, development, testing on multiple devices, app store submission, and post-launch support.",
+      "For mobile apps, we follow a systematic approach: requirements analysis, planning, UX/UI design, development, testing, app store deployment, and maintenance."
+    ],
+    "digital_marketing": [
+      "Our digital marketing process involves research and strategy development, implementation across chosen channels, continuous monitoring, and regular reporting and optimization.",
+      "For digital marketing, we begin with market research, develop a customized strategy, implement campaigns, monitor performance, provide regular reports, and continuously optimize for better results.",
+      "Our digital marketing methodology includes audience research, competitive analysis, strategy development, campaign setup, ongoing optimization, and regular performance reviews."
+    ]
+  },
+  "technologies": {
+    "web": [
+      "For web development, we use technologies like HTML5, CSS3, JavaScript, React, Vue.js, Node.js, PHP, WordPress, Laravel, and various database solutions including MySQL and MongoDB.",
+      "Our web stack includes modern technologies such as React, Vue.js, Angular, Node.js, PHP frameworks like Laravel and CodeIgniter, and CMS platforms like WordPress and Shopify.",
+      "We leverage various web technologies including HTML5/CSS3/JavaScript, modern frameworks like React and Vue.js, backend technologies like Node.js and PHP, and database solutions such as MySQL and MongoDB."
+    ],
+    "mobile": [
+      "For mobile development, we use native technologies (Swift for iOS, Kotlin for Android) as well as cross-platform frameworks like React Native and Flutter.",
+      "Our mobile development stack includes native technologies (Swift, Kotlin) and cross-platform solutions (React Native, Flutter) depending on project requirements.",
+      "We develop mobile applications using both native technologies (Swift for iOS and Kotlin for Android) and cross-platform frameworks like React Native and Flutter for cost-effective multi-platform deployment."
+    ],
+    "marketing": [
+      "Our marketing team uses tools like Google Analytics, SEMrush, Ahrefs, HubSpot, Mailchimp, Buffer, Hootsuite, Facebook Ads Manager, and Google Ads for campaign management and analysis.",
+      "For digital marketing, we utilize platforms like Google Analytics, SEMrush, HubSpot, Mailchimp, social media management tools, and various advertising platforms.",
+      "Our marketing technology stack includes analytics tools (Google Analytics, SEMrush, Ahrefs), email platforms (Mailchimp, SendinBlue), social media tools (Hootsuite, Buffer), and advertising platforms (Google Ads, Facebook Ads)."
+    ]
+  },
+  "portfolio": {
+    "web": [
+      "Our web portfolio includes e-commerce platforms for major retailers, corporate websites for financial institutions, educational portals for universities, and custom web applications for healthcare providers.",
+      "Notable web projects include an award-winning e-commerce platform for a pan-African retailer, a banking portal serving over 500,000 customers, and a property listing website with 50,000+ monthly users.",
+      "We've developed various web solutions including a major e-commerce platform with 200,000+ monthly users, a fintech web application processing $10M in transactions monthly, and corporate websites for leading African businesses."
+    ],
+    "mobile": [
+      "Our mobile app portfolio includes a fintech payment app with over 1 million downloads, a health monitoring application for a major hospital chain, and a popular food delivery service operating in five countries.",
+      "We've developed mobile applications including a banking app serving 300,000+ users, a ride-sharing platform operating in three countries, and an educational app used by 50+ schools.",
+      "Notable mobile projects include a payment app processing over 100,000 transactions daily, a health and wellness app with 500,000+ users, and a retail loyalty app for a major supermarket chain."
+    ],
+    "marketing": [
+      "Our marketing portfolio includes successful campaigns for businesses ranging from startups to major corporations, achieving significant improvements in online visibility, engagement, and conversion rates.",
+      "We've run successful digital marketing campaigns for clients across various industries, including a campaign that increased e-commerce sales by 200%, an SEO strategy that boosted organic traffic by 150%, and social media campaigns achieving engagement rates 3x industry averages.",
+      "Our marketing success stories include a complete digital strategy for a hospitality brand that increased bookings by 85%, an SEO campaign that took a client from page 5 to page 1 for key terms, and a social media strategy that grew a client's following from 5,000 to 50,000 in six months."
+    ],
+    "case_studies": [
+      "Visit our website to view detailed case studies showing how our digital solutions have helped businesses across Africa overcome challenges and achieve significant growth.",
+      "Our case studies showcase measurable results from our work, such as a 300% ROI on an e-commerce project, 85% increase in leads for a B2B client, and 200% growth in organic traffic through our SEO strategies.",
+      "We document our success stories through detailed case studies, highlighting challenges, solutions, and measurable results across web development, mobile apps, and digital marketing projects."
+    ]
+  }
+} 

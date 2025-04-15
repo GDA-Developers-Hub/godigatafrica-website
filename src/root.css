@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: rgba(16,112,184,255);  
+    --background-light: #ffffff; 
+    --text-primary: rgb(0, 0, 0);
+    --text-secondary: #0e0d1c; 
+    --text-secondary-white: #ffffff; 
+    --card-background: #5995d9;
+    --card-darkmode-background: #14406c;
+    --logo-bg:#1070b8;
+    --light-bg: #6ca6dc41;
+    --navbar-background: #ffffff;
+  }
+
+  .dark {
+    --background: #0f172a; 
+    --background-light: #0c182edb; 
+    --text-primary: rgb(255, 255, 255);
+    --text-secondary: #ffffff; 
+    --text-secondary-white: #0e0d1c;
+    --card-background: #19232e;
+    --card-darkmode-background: #151f34;
+    --logo-bg:#1070b8;
+    --light-bg: #041226c1;
+    --navbar-background: #101020;
+
+
+  }
+
+  body {
+    @apply bg-[var(--body-bg)] text-[var(--text-primary)];
+  }
+}

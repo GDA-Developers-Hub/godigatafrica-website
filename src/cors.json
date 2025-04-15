@@ -1,0 +1,9 @@
+[
+    {
+      "origin": ["http://localhost:5173", "https://godigital-africa.web.app","https://localhost:5174"],
+      "method": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "responseHeader": ["Content-Type", "Access-Control-Allow-Origin"],
+      "maxAgeSeconds": 3600
+    }
+  ]
+  

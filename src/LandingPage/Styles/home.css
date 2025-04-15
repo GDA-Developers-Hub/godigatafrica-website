@@ -1,0 +1,13 @@
+.home-left-div{
+    background-image: url("../../assets/Nairobi.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+}
+@media (min-width: 1024px) {
+    .home-left-div{
+        background: none;
+    }
+    
+}

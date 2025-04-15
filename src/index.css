@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+  }
+  
+  * {
+    scrollbar-width: none;
+    -ms-overflow-style: none; 
+  }
+  
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+  .animate-heartbeat {
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+
+  
+  @keyframes float {
+    0% {
+      transform: translateY(0) translateX(0);
+    }
+    25% {
+      transform: translateY(-20px) translateX(10px);
+    }
+    50% {
+      transform: translateY(-10px) translateX(20px);
+    }
+    75% {
+      transform: translateY(-30px) translateX(-10px);
+    }
+    100% {
+      transform: translateY(0) translateX(0);
+    }
+  }
+  
+  .hover-fill-text {
+    display: inline-block;
+    font-size: 2.7rem;
+    font-weight: 800;
+    position: relative;
+    cursor: pointer;
+    margin-top: 20px;
+  
+    color: transparent;
+  
+    background: rgba(21, 20, 20, 0.604);
+    background-size: 0% 100%;
+    background-repeat: no-repeat;
+    background-position: left;
+    -webkit-background-clip: text;
+    background-clip: text;
+  
+    -webkit-text-stroke: 1px rgb(255, 255, 255);
+  
+    transition: background-size 0.5s ease-in-out;
+  }
+  .hover-fill-text-go {
+    display: inline-block;
+    font-size: 2.7rem;
+    font-weight: 800;
+    position: relative;
+    cursor: pointer;
+    margin-top: 20px;
+  
+    color: transparent;
+  
+    background: rgba(16,112,184,255);
+    background-size: 0% 100%;
+    background-repeat: no-repeat;
+    background-position: left;
+    -webkit-background-clip: text;
+    background-clip: text;
+  
+    -webkit-text-stroke: 1px white;
+  
+    transition: background-size 0.5s ease-in-out;
+  }
+  .hover-fill-text:hover {
+    background-size: 100% 100%;
+  }
+  
+  p {
+    margin-top: 2rem;
+    font-size: 1rem;
+    opacity: 0.7;
+  }
+  
+  @media (max-width: 768px) {
+    .hover-fill-text {
+      font-size: 3rem;
+      -webkit-text-stroke: 1.5px rgb(8, 146, 208);
+    }
+  }
+  
+  @keyframes flashBorder {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: #ffffff; }
+}
+.border-flash {
+  animation: flashBorder 2s infinite;
+}
+
+  
