@@ -1,0 +1,14 @@
+The following sound files need to be placed in this directory:
+
+1. notification.mp3 - Default notification sound
+2. chime.mp3 - Chime notification sound
+3. bell.mp3 - Bell notification sound
+
+These files should be short audio clips in MP3 format suitable for notification sounds.
+
+You can download royalty-free notification sounds from sources like:
+- https://mixkit.co/free-sound-effects/notification/
+- https://notificationsounds.com/
+- https://www.zapsplat.com/
+
+Example file sizes should be around 50-200KB for each sound file. 
