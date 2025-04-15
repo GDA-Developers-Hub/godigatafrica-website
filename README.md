@@ -5,9 +5,7 @@ This is the official monorepo for the **GoDigitAfrica** website. It includes:
 - 🌐 `django_backend` – The Django-based backend powering the platform.
 - 🤖 `chatbot` – A conversational AI module integrated into the website.
 - 🎨 `frontend` – The user-facing interface, built with React.
-
 ---
-
 ## 🛠 Folder Structure
 
 ```
