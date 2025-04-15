@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
+
 from pathlib import Path
 from datetime import timedelta
 import dj_database_url
@@ -35,35 +36,43 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Debug mode
-DEBUG = os.getenv("DEBUG") == "True"
+DEBUG = os.getenv("DEBUG") == "False"
 
 # Allowed hosts
 # ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 #ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "go-digital-africa-production.up.railway.app,localhost,127.0.0.1").split(",")
 
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+logger.debug(f"ALLOWED_HOSTS: {ALLOWED_HOSTS}")
+
+
 ALLOWED_HOSTS = [
-    "go-digital-africa-production.up.railway.app",
-    "127.0.0.1",
-    "localhost"
+    'server-628309.hostingwithgda.com', 
+    '127.0.0.1', 
+    'localhost', 
+    'hostingwithgda.com'
 ]
 
 
+
 # If using wildcard (not recommended for production)
-CORS_ALLOW_ALL_ORIGINS = True  # For testing only
+CORS_ALLOW_ALL_ORIGINS = False  # For testing only
 
 # Allow credentials (if using authentication)
 CORS_ALLOW_CREDENTIALS = True
 
 
 # Allow requests from your React frontend (Update this with your frontend URL)
-CORS_ALLOWED_ORIGINS = [
+CSRF_TRUSTED_ORIGINS = [
     "https://go-digital-africa-production.up.railway.app",
-    "http://localhost:3000",  # If calling API from React/JS locally
-    "https://godigital-africa.web.app", #Versile deployed
+    "http://hostingwithgda.com",
+    "https://hostingwithgda.com",
 ]
 
-CSRF_TRUSTED_ORIGINS = ["https://go-digital-africa-production.up.railway.app"]
 
 
 # Allow all HTTP methods (GET, POST, PUT, DELETE)
@@ -134,9 +143,14 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
-    "default": dj_database_url.parse(
-        "postgresql://postgres:aGWVuIhIlgVdScMJmBJfTFynmOKTXlKA@centerbeam.proxy.rlwy.net:14327/railway", conn_max_age=600, ssl_require=True
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'hostwithus_django_project',
+        'USER': 'hostwithus_website',
+        'PASSWORD': 'GDAKenyaDevelopers',
+        'HOST': 'localhost',  # Or use your actual hosting IP if needed
+        'PORT': '3306',
+    }
 }
 
 # Password validation
@@ -250,6 +264,10 @@ EMAIL_HOST_USER = "kipropismael27@gmail.com"
 EMAIL_HOST_PASSWORD = "vvmwtssiaafwolhh"  # Use App Password for security
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+
+# settings.py
+FORCE_SCRIPT_NAME = '/django'
+STATIC_URL = '/django/static/'
 
 # Frontend URL
 FRONTEND_URL = "https://godigital-africa.web.app"
