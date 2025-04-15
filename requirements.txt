@@ -49,6 +49,9 @@ validators
 
 mysqlclient==2.2.7
 
+PyMySQL==1.1.0
+
+
 
 
 
