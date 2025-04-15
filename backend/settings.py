@@ -60,17 +60,17 @@ ALLOWED_HOSTS = [
 
 
 # If using wildcard (not recommended for production)
-CORS_ALLOW_ALL_ORIGINS = False  # For testing only
 
 # Allow credentials (if using authentication)
 CORS_ALLOW_CREDENTIALS = True
 
 
 # Allow requests from your React frontend (Update this with your frontend URL)
+
 CSRF_TRUSTED_ORIGINS = [
     "https://godigatafrica-website-production.up.railway.app",
     "https://go-digital-africa-production.up.railway.app",
-    "http://hostingwithgda.com",
+    "http://hostingwithgda.com/website/",
     "https://hostingwithgda.com",
 ]
 
@@ -81,6 +81,12 @@ CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
 
 # Allow specific headers
 CORS_ALLOW_HEADERS = ["*"]
+
+CORS_ALLOWED_ORIGINS = [
+    "https://hostingwithgda.com",
+    "http://hostingwithgda.com/website/",
+]
+
 
 
 SESSION_COOKIE_SECURE = True  # Enable in production
