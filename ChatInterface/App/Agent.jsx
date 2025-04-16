@@ -104,19 +104,32 @@ const Agent = () => {
   const filterActiveRooms = (rooms) => {
     console.log("Filtering rooms:", rooms.length, "Socket ID:", socket?.id);
     
+    const now = Date.now();
+    const tenMinutesAgo = now - RECENT_CONVERSATION_LIMIT;
+    
     const filtered = rooms
       .filter(room => {
         // Log room details for debugging
         const isActive = room.active;
         const hasNoAgent = !room.assignedAgentId;
         const isAssignedToMe = room.assignedAgentId === socket?.id;
-        const shouldKeep = isActive && (hasNoAgent || isAssignedToMe);
         
-        console.log(`Room ${room.id.substring(0, 8)}: active=${isActive}, assigned=${room.assignedAgentId ? 'yes' : 'no'}, mine=${isAssignedToMe}, keep=${shouldKeep}`);
+        // Check if room is recent (less than 10 minutes old)
+        const timestamp = room.lastActivityTimestamp 
+          ? new Date(room.lastActivityTimestamp).getTime() 
+          : room.createdAt 
+            ? new Date(room.createdAt).getTime() 
+            : 0;
+        const isRecent = timestamp > tenMinutesAgo;
         
         // Keep a room if:
         // 1. It's active AND
         // 2. Either it has no assigned agent (waiting for pickup) OR it's assigned to current agent
+        // 3. AND it has activity in the last 10 minutes
+        const shouldKeep = isActive && (hasNoAgent || isAssignedToMe) && isRecent;
+        
+        console.log(`Room ${room.id.substring(0, 8)}: active=${isActive}, assigned=${room.assignedAgentId ? 'yes' : 'no'}, mine=${isAssignedToMe}, recent=${isRecent}, keep=${shouldKeep}`);
+        
         return shouldKeep;
       })
       .sort((a, b) => {
