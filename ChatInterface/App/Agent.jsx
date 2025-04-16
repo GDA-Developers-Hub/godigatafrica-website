@@ -1061,19 +1061,44 @@ const Agent = () => {
   // Add explicit request for available rooms after connection
   useEffect(() => {
     if (socket && socket.connected) {
-      console.log("CONNECTED - Explicitly requesting available rooms");
-      // Request available rooms list
+      console.log("🔌 SOCKET CONNECTED - Requesting available rooms");
+      
+      // Request rooms immediately
       socket.emit("get_available_rooms");
       
-      // Set up periodic refresh
-      const refreshInterval = setInterval(() => {
-        console.log("Refreshing available rooms");
+      // Then set up a more frequent initial polling before settling to longer intervals
+      const quickRefreshInterval = setInterval(() => {
+        console.log("🔄 Quick refresh - Requesting available rooms");
         socket.emit("get_available_rooms");
-      }, 15000); // Refresh every 15 seconds
+      }, 2000); // Every 2 seconds initially
       
-      return () => clearInterval(refreshInterval);
+      // After 10 seconds, switch to normal polling interval
+      setTimeout(() => {
+        clearInterval(quickRefreshInterval);
+        
+        const normalRefreshInterval = setInterval(() => {
+          console.log("🔄 Normal refresh - Requesting available rooms");
+          socket.emit("get_available_rooms");
+        }, 15000); // Every 15 seconds
+        
+        return () => clearInterval(normalRefreshInterval);
+      }, 10000);
+      
+      return () => clearInterval(quickRefreshInterval);
     }
   }, [socket, isConnected]);
+  
+  // Debug rooms when they change
+  useEffect(() => {
+    console.log("Available rooms updated:", availableRooms);
+    console.log("Room details:", availableRooms.map(r => ({
+      id: r.id.substring(0, 8), 
+      userName: r.userName,
+      active: r.active,
+      assigned: r.assignedAgentId ? (r.assignedAgentId === socket?.id ? "to me" : "to other") : "unassigned",
+      lastMessage: r.lastMessage?.substring(0, 20)
+    })));
+  }, [availableRooms]);
   
   // Add check for SOCKET_BASE_URL validity
   useEffect(() => {
@@ -1085,6 +1110,14 @@ const Agent = () => {
       console.error("INVALID SOCKET URL:", SOCKET_BASE_URL, e);
     }
   }, []);
+
+  // Add indicator component for socket connection status
+  const ConnectionStatus = ({ isConnected }) => (
+    <div className={`flex items-center ${isConnected ? 'text-green-500' : 'text-red-500'}`}>
+      <div className={`w-2 h-2 ${isConnected ? 'bg-green-500' : 'bg-red-500'} rounded-full mr-1`}></div>
+      <span className="text-xs">{isConnected ? 'Connected' : 'Offline'}</span>
+    </div>
+  );
 
   return (
     <div className="flex h-screen bg-gray-900">
@@ -1241,7 +1274,7 @@ const Agent = () => {
             </button>
           </div>
           <p className="text-sm text-gray-400 mt-1">
-            {isConnected ? "Online" : "Offline"}
+            <ConnectionStatus isConnected={isConnected} />
           </p>
         </div>
 
@@ -1344,6 +1377,31 @@ const Agent = () => {
             <div className="text-center p-6 text-gray-500">
               <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
               <p>No {showAllConversations ? "" : "active"} support requests</p>
+              
+              {isConnected ? (
+                <>
+                  <div className="text-xs text-gray-400 mt-2 mb-3">
+                    {showAllConversations 
+                      ? "There are no conversations in the system" 
+                      : "There are no active conversations waiting for assistance"}
+                  </div>
+                  <button
+                    onClick={() => {
+                      console.log("🔄 Manual refresh triggered");
+                      if (socket && socket.connected) {
+                        socket.emit("get_available_rooms");
+                      }
+                    }}
+                    className="flex items-center justify-center gap-1 bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1.5 rounded-lg text-sm transition mx-auto"
+                  >
+                    <span>Refresh Conversations</span>
+                  </button>
+                </>
+              ) : (
+                <div className="text-xs text-red-400 p-2 bg-red-900/20 rounded-lg mt-2">
+                  Not connected to server. Please refresh the page.
+                </div>
+              )}
             </div>
           )}
         </div>
