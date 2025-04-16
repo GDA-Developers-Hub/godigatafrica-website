@@ -129,6 +129,34 @@ const Agent = () => {
     console.log("Filtered result:", filtered.length, "rooms");
     return filtered;
   };
+  
+  // Function to filter for "Show All" - includes my assigned chats for history
+  const filterAllRooms = (rooms) => {
+    console.log("Filtering all rooms for history view:", rooms.length);
+    
+    const filtered = rooms
+      .filter(room => {
+        // Include:
+        // 1. Any room assigned to me (active or inactive) - for history
+        // 2. Any active waiting room
+        const isActive = room.active;
+        const hasNoAgent = !room.assignedAgentId;
+        const isAssignedToMe = room.assignedAgentId === socket?.id;
+        const isActiveWaiting = isActive && hasNoAgent;
+        const shouldKeep = isAssignedToMe || isActiveWaiting;
+        
+        return shouldKeep;
+      })
+      .sort((a, b) => {
+        // Sort by most recent activity
+        const aTime = a.lastActivityTimestamp ? new Date(a.lastActivityTimestamp).getTime() : 0;
+        const bTime = b.lastActivityTimestamp ? new Date(b.lastActivityTimestamp).getTime() : 0;
+        return bTime - aTime; // Newest first
+      });
+    
+    console.log("Filtered all rooms result:", filtered.length, "rooms");
+    return filtered;
+  };
 
   // Function to sort all conversations by activity timestamp
   const sortByActivityTime = (rooms) => {
@@ -272,72 +300,69 @@ const Agent = () => {
 
     // Listen for room update events
     newSocket.on("room_updated", (updatedRoom) => {
-      debugLog("Room updated event:", updatedRoom);
+      // Show notification for new rooms with no assigned agent (waiting rooms)
+      const roomExistsInitially = allRooms.some(room => room.id === updatedRoom.id);
+      const isNewWaitingRoom = !updatedRoom.assignedAgentId && updatedRoom.active && !roomExistsInitially;
+      
+      if (isNewWaitingRoom) {
+        // This is a brand new waiting room - show notification
+        playNotificationSound();
+        
+        // Show toast notification for new chat
+        Swal.fire({
+          title: 'New Chat Request',
+          text: `New support request from ${updatedRoom.userName || 'Customer'}`,
+          icon: 'info',
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 5000,
+          timerProgressBar: true,
+        });
+      }
+      
+      // Continue with regular room_updated handling
+      debugLog("[EVENT room_updated] Received update for room:", updatedRoom.id.substring(0, 8));
       
       if (!updatedRoom || !updatedRoom.id) {
-        debugLog("ERROR: Invalid room update format");
+        debugLog("[ERROR] Invalid room update format received");
         return;
       }
       
-      // Check if this is an active room update
-      const isForActiveRoom = activeRoom?.id === updatedRoom.id;
-      debugLog(`Update is for active room: ${isForActiveRoom}`);
-      
-      // Update in all rooms list first
+      // 1. Update the master list of all rooms
+      let updatedAllRooms;
       setAllRooms(prev => {
         const roomExists = prev.some(room => room.id === updatedRoom.id);
-        debugLog(`Room ${updatedRoom.id} exists in allRooms: ${roomExists}`);
+        debugLog(`Room ${updatedRoom.id.substring(0, 8)} exists in allRooms: ${roomExists}`);
         
-        let updated;
+        let updatedList;
         if (roomExists) {
-          updated = prev.map(room => 
+          updatedList = prev.map(room => 
             room.id === updatedRoom.id ? { ...room, ...updatedRoom } : room
           );
         } else {
-          updated = [...prev, updatedRoom];
+          updatedList = [...prev, updatedRoom];
         }
         
-        return sortByActivityTime(updated);
+        updatedAllRooms = sortByActivityTime(updatedList);
+        return updatedAllRooms;
       });
       
-      // Update in available rooms - ensure we only include rooms available to this agent
+      // 2. Update the visible availableRooms based on the current filter view
       setAvailableRooms(prev => {
-        const roomExists = prev.some(room => room.id === updatedRoom.id);
-        debugLog(`Room ${updatedRoom.id} exists in availableRooms: ${roomExists}`);
-        
-        // Only keep room if either:
-        // 1. Room is active and has no assignedAgentId (waiting for an agent)
-        // 2. Room is active and assignedAgentId matches this agent's socket.id
-        const isAvailableToThisAgent = updatedRoom.active && 
-          (!updatedRoom.assignedAgentId || updatedRoom.assignedAgentId === socket.id);
-        
-        let updated;
-        if (roomExists) {
-          updated = prev.map(room => 
-            room.id === updatedRoom.id ? { ...room, ...updatedRoom } : room
-          );
-        } else if (isAvailableToThisAgent) {
-          updated = [...prev, updatedRoom];
-        } else {
-          updated = prev;
-        }
-        
-        return filterActiveRooms(updated);
+        const currentFilter = showAllConversations ? filterAllRooms : filterActiveRooms;
+        // Re-filter the *updated* master list
+        const newlyFiltered = currentFilter(updatedAllRooms || allRooms); 
+        debugLog(`[FILTER UPDATE] Re-filtered rooms for view: ${showAllConversations ? 'All' : 'Active'}. Count: ${newlyFiltered.length}`);
+        return newlyFiltered;
       });
       
-      // If this update is for active room, update it
+      // 3. Update the active room if the update is for it
+      const isForActiveRoom = activeRoom?.id === updatedRoom.id;
+      debugLog(`Update is for currently active room: ${isForActiveRoom}`);
       if (isForActiveRoom) {
-        debugLog("Updating active room state");
+        debugLog("[ACTIVE ROOM UPDATE] Updating active room state");
         setActiveRoom(prev => ({ ...prev, ...updatedRoom, unread: false }));
-      }
-      
-      // Check if we need to play a notification
-      const isUnread = updatedRoom.unread === true;
-      const hasNewMessage = activeRoom?.lastMessage !== updatedRoom.lastMessage;
-      
-      if ((isUnread || (hasNewMessage && !isForActiveRoom))) {
-        debugLog("Playing notification for room update");
-        playNotificationSound();
       }
     });
 
@@ -436,26 +461,27 @@ const Agent = () => {
       })));
       
       // Verify the filtering function works correctly
-      const filteredRooms = filterActiveRooms(rooms);
-      console.log("Filtered rooms:", filteredRooms.length);
-      console.log("Filter details:", filteredRooms.map(r => ({
-        id: r.id.substring(0, 8),
-        reason: (!r.assignedAgentId ? "unassigned" : "assigned to me")
-      })));
+      const activeFilteredRooms = filterActiveRooms(rooms);
+      const allFilteredRooms = filterAllRooms(rooms);
+      
+      console.log("Active filtered rooms:", activeFilteredRooms.length);
+      console.log("All filtered rooms:", allFilteredRooms.length);
       
       // Store all rooms and sort them by activity time
       const sortedRooms = sortByActivityTime(rooms);
       setAllRooms(sortedRooms);
       
-      // Filter active rooms for the main view
-      const activeRooms = filterActiveRooms(rooms);
+      // Filter rooms for the main view based on current display mode
+      const displayRooms = showAllConversations 
+        ? filterAllRooms(rooms)
+        : filterActiveRooms(rooms);
       
       // Play notification if there are new active rooms
-      if (activeRooms.length > availableRooms.length) {
+      if (displayRooms.length > availableRooms.length) {
         playNotificationSound();
       }
       
-      setAvailableRooms(activeRooms);
+      setAvailableRooms(displayRooms);
     });
 
     newSocket.on("new_message", (message) => {
@@ -676,50 +702,6 @@ const Agent = () => {
       // ... rest of request handling
     });
 
-    // Add a separate useEffect for user connection events
-    useEffect(() => {
-      if (socket) {
-        // Listen for user socket events
-        const userJoinHandler = (data) => {
-          console.log("👤 USER JOINED CHAT:", data);
-          
-          // Show notification to agent
-          Swal.fire({
-            title: 'User Connected',
-            text: `${data.userName || 'Customer'} has joined the chat`,
-            icon: 'info',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-          });
-        };
-        
-        const userDisconnectHandler = (data) => {
-          console.log("👤 USER DISCONNECTED:", data);
-          
-          // Show notification to agent
-          Swal.fire({
-            title: 'User Disconnected',
-            text: `${data.userName || 'Customer'} has disconnected from the chat`,
-            icon: 'warning',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-          });
-        };
-        
-        socket.on("user_joined", userJoinHandler);
-        socket.on("user_disconnected", userDisconnectHandler);
-        
-        return () => {
-          socket.off("user_joined", userJoinHandler);
-          socket.off("user_disconnected", userDisconnectHandler);
-        };
-      }
-    }, [socket]);
-
     return () => {
       if (inactivityTimer) {
         console.log("Agent: Clearing inactivity timer due to component unmount");
@@ -728,6 +710,50 @@ const Agent = () => {
       newSocket.disconnect();
     };
   }, [agent]);
+
+  // Add a separate useEffect for user connection events
+  useEffect(() => {
+    if (socket) {
+      // Listen for user socket events
+      const userJoinHandler = (data) => {
+        console.log("👤 USER JOINED CHAT:", data);
+        
+        // Show notification to agent
+        Swal.fire({
+          title: 'User Connected',
+          text: `${data.userName || 'Customer'} has joined the chat`,
+          icon: 'info',
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000,
+        });
+      };
+      
+      const userDisconnectHandler = (data) => {
+        console.log("👤 USER DISCONNECTED:", data);
+        
+        // Show notification to agent
+        Swal.fire({
+          title: 'User Disconnected',
+          text: `${data.userName || 'Customer'} has disconnected from the chat`,
+          icon: 'warning',
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 3000,
+        });
+      };
+      
+      socket.on("user_joined", userJoinHandler);
+      socket.on("user_disconnected", userDisconnectHandler);
+      
+      return () => {
+        socket.off("user_joined", userJoinHandler);
+        socket.off("user_disconnected", userDisconnectHandler);
+      };
+    }
+  }, [socket]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -1050,6 +1076,17 @@ const Agent = () => {
   // Toggle between showing active conversations and all conversations
   const toggleConversationView = () => {
     setShowAllConversations(!showAllConversations);
+    
+    // Update displayed rooms based on the new filter
+    if (!showAllConversations) {
+      // Switching to "Show All" - use filterAllRooms
+      const filteredRooms = filterAllRooms(allRooms);
+      setAvailableRooms(filteredRooms);
+    } else {
+      // Switching to "Show Active" - use filterActiveRooms
+      const filteredRooms = filterActiveRooms(allRooms);
+      setAvailableRooms(filteredRooms);
+    }
   };
 
   // Add this debug function near the top of the component
@@ -1310,14 +1347,14 @@ const Agent = () => {
         <div className="flex-1 overflow-y-auto p-3">
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-sm font-semibold text-gray-400">
-              {showAllConversations ? "ALL CONVERSATIONS" : "ACTIVE CONVERSATIONS"}
+              {showAllConversations ? "MY CHAT HISTORY" : "ACTIVE CONVERSATIONS"}
             </h3>
             <div className="flex space-x-1">
               <button 
                 onClick={toggleConversationView}
                 className="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-blue-300"
               >
-                {showAllConversations ? "Show Active" : "View All"}
+                {showAllConversations ? "Show Active" : "My History"}
               </button>
               <button 
                 onClick={() => {
@@ -1343,7 +1380,9 @@ const Agent = () => {
                   className={`w-full text-left p-3 rounded-lg transition ${
                     activeRoom && activeRoom.id === room.id
                       ? "bg-blue-900 border border-blue-700"
-                      : "bg-gray-700 hover:bg-gray-650 border border-gray-600"
+                      : room.assignedAgentId === socket?.id 
+                        ? "bg-blue-800/50 hover:bg-blue-800 border border-blue-700"
+                        : "bg-gray-700 hover:bg-gray-650 border border-gray-600"
                   }`}
                 >
                   <div className="flex justify-between items-center">
@@ -1351,24 +1390,33 @@ const Agent = () => {
                     <span className={`text-xs px-2 py-1 rounded-full ${
                       !room.active 
                         ? "bg-gray-600 text-gray-300"
-                        : room.assignedAgentId
-                          ? "bg-blue-800 text-blue-200"
-                          : "bg-green-800 text-green-200"
+                        : room.assignedAgentId === socket?.id
+                          ? "bg-blue-600 text-blue-100"
+                          : room.assignedAgentId
+                            ? "bg-gray-600 text-gray-300"
+                            : "bg-green-700 text-green-100"
                     }`}>
                       {!room.active 
-                        ? "Inactive" 
-                        : room.assignedAgentId 
-                          ? (room.assignedAgentId === socket?.id ? "Your Chat" : "Assigned") 
-                          : "Waiting"}
+                        ? "Closed" 
+                        : room.assignedAgentId === socket?.id
+                          ? "My Chat"
+                          : room.assignedAgentId
+                            ? "Assigned"
+                            : "Waiting"}
                     </span>
                   </div>
                   <p className="text-xs text-gray-400 mt-1 truncate">
                     {room.lastMessage || "Waiting for assistance..."}
                   </p>
                   {room.lastActivityTimestamp && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      {new Date(room.lastActivityTimestamp).toLocaleTimeString()}
-                    </p>
+                    <div className="flex justify-between items-center mt-1">
+                      <p className="text-xs text-gray-500">
+                        {new Date(room.lastActivityTimestamp).toLocaleTimeString()}
+                      </p>
+                      {showAllConversations && !room.active && room.assignedAgentId === socket?.id && (
+                        <span className="text-xs text-gray-500">(History)</span>
+                      )}
+                    </div>
                   )}
                 </button>
               ))}
@@ -1382,7 +1430,7 @@ const Agent = () => {
                 <>
                   <div className="text-xs text-gray-400 mt-2 mb-3">
                     {showAllConversations 
-                      ? "There are no conversations in the system" 
+                      ? "You don't have any assigned chats in your history" 
                       : "There are no active conversations waiting for assistance"}
                   </div>
                   <button
