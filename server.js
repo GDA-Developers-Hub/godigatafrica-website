@@ -85,7 +85,8 @@ const notifyRoomUpdate = (room) => {
       lastMessage: room.lastMessage,
       active: room.active,
       lastActivityTimestamp: room.lastActivityTimestamp,
-      unread: room.unread
+      unread: room.unread,
+      assignedAgentId: room.assignedAgentId
     });
     notifiedCount++;
   }
@@ -240,16 +241,17 @@ io.on("connection", (socket) => {
         }
       });
       
-      // Only unassigned rooms for agent sidebar
+      // Include rooms that are either unassigned OR assigned to this agent
       const availableRoomsList = allRooms
-        .filter(room => !room.assignedAgentId) // Only rooms without assigned agents
+        .filter(room => room.active && (!room.assignedAgentId || room.assignedAgentId === socket.id))
         .map(room => ({
           id: room.id,
           userName: room.userName,
           lastMessage: room.lastMessage,
           waitTime: getWaitTime(room.createdAt),
-          active: room.active !== false,
-          lastActivityTimestamp: room.lastActivityTimestamp
+          active: true,
+          lastActivityTimestamp: room.lastActivityTimestamp,
+          assignedAgentId: room.assignedAgentId
         }));
       
       socket.emit("available_rooms", availableRoomsList);
@@ -518,7 +520,7 @@ io.on("connection", (socket) => {
     }
     
     // Mark agent as assigned to this room
-    room.assignedAgentId = socket.id;
+    room.assignedAgentId = socket.id; // Store socket ID for real-time access
     
     // Update room activity status and timestamp
     room.active = true;
@@ -534,7 +536,7 @@ io.on("connection", (socket) => {
     console.log(`Agent ${agent.name} joined room: ${roomId}`);
     
     try {
-      // Update room in database
+      // Update room in database with agent's database ID
       await pool.query(
         "UPDATE chat_rooms SET assigned_agent_id = ?, status = 'active', updated_at = CURRENT_TIMESTAMP WHERE id = ?",
         [agent.dbId, roomId]
@@ -661,7 +663,7 @@ io.on("connection", (socket) => {
       }
       
       // Get available rooms and send to agent
-      const availableRooms = await getAvailableRooms();
+      const availableRooms = await getAvailableRooms(socket.id);
       
       socket.emit("room_left", { 
         success: true,
@@ -759,7 +761,8 @@ io.on("connection", (socket) => {
         lastMessage: content,
         active: true,
         lastActivityTimestamp: new Date().toISOString(),
-        unread: role === 'user' // Mark as unread if from user
+        unread: role === 'user', // Mark as unread if from user
+        assignedAgentId: room.assignedAgentId // Include agent assignment info
       };
       
       // Send room_updated to all agents
@@ -1019,20 +1022,38 @@ io.on("connection", (socket) => {
 });
 
 // Helper: Get available rooms
-async function getAvailableRooms() {
+async function getAvailableRooms(agentSocketId = null) {
   try {
-    // Get waiting and active rooms from database
-    const [availableRooms] = await pool.query(`
+    // Get all active rooms from database that are either:
+    // 1. Not assigned to any agent (waiting for pickup) OR
+    // 2. Assigned to the requesting agent (if agentSocketId is provided)
+    let query = `
       SELECT 
         cr.id, cr.user_name, cr.status, cr.created_at, cr.updated_at, cr.last_message,
+        cr.assigned_agent_id,
         (SELECT MAX(created_at) FROM chat_messages 
          WHERE room_id = cr.id) as last_activity_time
       FROM chat_rooms cr
-      WHERE cr.status != 'closed' AND cr.assigned_agent_id IS NULL
+      WHERE cr.status != 'closed' AND (cr.assigned_agent_id IS NULL`;
+    
+    // If we have an agent socket ID, also include rooms assigned to this agent
+    const params = [];
+    if (agentSocketId) {
+      // Get the agent ID from the agents table
+      const agent = activeAgents.get(agentSocketId);
+      if (agent && agent.dbId) {
+        query += ` OR cr.assigned_agent_id = ?`;
+        params.push(agent.dbId);
+      }
+    }
+    
+    query += `)
       ORDER BY 
         CASE WHEN cr.status = 'active' THEN 0 ELSE 1 END,
         COALESCE(last_activity_time, cr.updated_at, cr.created_at) DESC
-    `);
+    `;
+    
+    const [availableRooms] = await pool.query(query, params);
     
     return availableRooms.map(room => {
       const lastActivityTime = room.last_activity_time || room.updated_at || room.created_at;
@@ -1040,6 +1061,20 @@ async function getAvailableRooms() {
       
       // Mark rooms as active if they have recent activity or status is 'active'
       const active = room.status === 'active' || isActive;
+
+      // Convert database agent ID to socket ID if assigned
+      const dbAgentId = room.assigned_agent_id;
+      let assignedAgentId = null;
+      
+      // Find the socket ID for this agent ID
+      if (dbAgentId) {
+        for (const [socketId, agent] of activeAgents.entries()) {
+          if (agent.dbId === dbAgentId) {
+            assignedAgentId = socketId;
+            break;
+          }
+        }
+      }
       
       return {
         id: room.id,
@@ -1048,7 +1083,8 @@ async function getAvailableRooms() {
         waitTime: getWaitTime(new Date(room.created_at)),
         active: active,
         lastActivityTimestamp: lastActivityTime,
-        unread: false // Default false for unassigned rooms
+        unread: false, // Default false for unassigned rooms
+        assignedAgentId: assignedAgentId
       };
     });
   } catch (error) {
@@ -1060,10 +1096,9 @@ async function getAvailableRooms() {
 // Helper: Update available rooms for all agents
 async function updateAvailableRoomsForAllAgents() {
   try {
-    const availableRoomsList = await getAvailableRooms();
-    
-    // Send updated list to all agents
+    // Update each agent with their personalized list of available rooms
     for (const [agentSocketId, _] of activeAgents.entries()) {
+      const availableRoomsList = await getAvailableRooms(agentSocketId);
       io.to(agentSocketId).emit("available_rooms", availableRoomsList);
     }
   } catch (error) {

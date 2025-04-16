@@ -103,7 +103,13 @@ const Agent = () => {
   // Function to filter and sort active conversations
   const filterActiveRooms = (rooms) => {
     return rooms
-      .filter(room => room.active)
+      .filter(room => {
+        // Keep a room if:
+        // 1. It's active AND
+        // 2. Either it has no assigned agent (waiting for pickup) OR it's assigned to current agent
+        return room.active && 
+               (!room.assignedAgentId || room.assignedAgentId === socket?.id);
+      })
       .sort((a, b) => {
         // Sort by most recent activity
         const aTime = a.lastActivityTimestamp ? new Date(a.lastActivityTimestamp).getTime() : 0;
@@ -277,18 +283,23 @@ const Agent = () => {
         return sortByActivityTime(updated);
       });
       
-      // Update in available rooms
+      // Update in available rooms - ensure we only include rooms available to this agent
       setAvailableRooms(prev => {
         const roomExists = prev.some(room => room.id === updatedRoom.id);
         debugLog(`Room ${updatedRoom.id} exists in availableRooms: ${roomExists}`);
         
-        // Only keep active rooms in this list
+        // Only keep room if either:
+        // 1. Room is active and has no assignedAgentId (waiting for an agent)
+        // 2. Room is active and assignedAgentId matches this agent's socket.id
+        const isAvailableToThisAgent = updatedRoom.active && 
+          (!updatedRoom.assignedAgentId || updatedRoom.assignedAgentId === socket.id);
+        
         let updated;
         if (roomExists) {
           updated = prev.map(room => 
             room.id === updatedRoom.id ? { ...room, ...updatedRoom } : room
           );
-        } else if (updatedRoom.active) {
+        } else if (isAvailableToThisAgent) {
           updated = [...prev, updatedRoom];
         } else {
           updated = prev;
