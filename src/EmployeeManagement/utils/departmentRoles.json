@@ -1,0 +1,119 @@
+{
+  "departments": [
+    {
+      "id": "Executive",
+      "label": "Executive",
+      "roles": ["CEO", "CTO", "CFO", "CMO", "Founder", "Co-Founder"]
+    },
+    {
+      "id": "Sales",
+      "label": "Sales",
+      "roles": ["Sales Lead"]
+    },
+    {
+      "id": "Human Resources",
+      "label": "Human Resources",
+      "roles": ["HR Manager"]
+    },
+    {
+      "id": "Engineering",
+      "label": "Engineering",
+      "roles": ["Software Engineer"]
+    },
+    {
+      "id": "Marketing",
+      "label": "Marketing",
+      "roles": ["Marketing Lead", "Social Media Marketer"]
+    },
+    {
+      "id": "Finance",
+      "label": "Finance",
+      "roles": ["CFO"]
+    },
+    {
+      "id": "Operations",
+      "label": "Operations",
+      "roles": ["CTO"]
+    },
+    {
+      "id": "Customer Support",
+      "label": "Customer Support",
+      "roles": ["Customer Support Representative"]
+    },
+    {
+      "id": "Software Development",
+      "label": "Software Development",
+      "roles": ["Frontend Developer", "Backend Developer", "Full Stack Developer"]
+    },
+    {
+      "id": "Data Science",
+      "label": "Data Science",
+      "roles": ["Data Scientist"]
+    },
+    {
+      "id": "Blockchain",
+      "label": "Blockchain",
+      "roles": ["Blockchain Developer"]
+    },
+    {
+      "id": "Cybersecurity",
+      "label": "Cybersecurity",
+      "roles": ["Cybersecurity Analyst"]
+    },
+    {
+      "id": "UI/UX Design",
+      "label": "UI/UX Design",
+      "roles": ["UI/UX Designer"]
+    },
+    {
+      "id": "DevOps",
+      "label": "DevOps",
+      "roles": ["DevOps Engineer"]
+    },
+    {
+      "id": "Graphic Design",
+      "label": "Graphic Design",
+      "roles": ["Graphic Designer"]
+    },
+    {
+      "id": "SEO & Marketing",
+      "label": "SEO & Marketing",
+      "roles": ["SEO Expert", "Social Media Marketer"]
+    }
+  ],
+  "countries": [
+    { "id": "Kenya", "label": "Kenya" },
+    { "id": "Somalia", "label": "Somalia" },
+    { "id": "Dubai", "label": "Dubai" },
+    { "id": "Ethiopia", "label": "Ethiopia" },
+    { "id": "Rwanda", "label": "Rwanda" },
+    { "id": "Tanzania", "label": "Tanzania" },
+    { "id": "Senegal", "label": "Senegal" },
+    { "id": "Ghana", "label": "Ghana" }
+  ],
+  "roles": [
+    { "id": "Founder", "label": "Founder", "rank": 3 },
+    { "id": "Co-Founder", "label": "Co-Founder", "rank": 4 },
+    { "id": "CEO", "label": "CEO", "rank": 1 },
+    { "id": "CTO", "label": "CTO", "rank": 2 },
+    { "id": "CFO", "label": "CFO", "rank": 5 },
+    { "id": "CMO", "label": "CMO", "rank": 6 },
+    { "id": "HR Manager", "label": "HR Manager", "rank": 7 },
+    { "id": "Sales Lead", "label": "Sales Lead", "rank": 8 },
+    { "id": "Marketing Lead", "label": "Marketing Lead", "rank": 9 },
+    { "id": "Software Engineer", "label": "Software Engineer", "rank": 10 },
+    { "id": "Frontend Developer", "label": "Frontend Developer", "rank": 11 },
+    { "id": "Backend Developer", "label": "Backend Developer", "rank": 12 },
+    { "id": "Full Stack Developer", "label": "Full Stack Developer", "rank": 13 },
+    { "id": "Data Scientist", "label": "Data Scientist", "rank": 14 },
+    { "id": "Blockchain Developer", "label": "Blockchain Developer", "rank": 15 },
+    { "id": "Cybersecurity Analyst", "label": "Cybersecurity Analyst", "rank": 16 },
+    { "id": "DevOps Engineer", "label": "DevOps Engineer", "rank": 17 },
+    { "id": "UI/UX Designer", "label": "UI/UX Designer", "rank": 18 },
+    { "id": "Customer Support Representative", "label": "Customer Support Representative", "rank": 19 },
+    { "id": "Graphic Designer", "label": "Graphic Designer", "rank": 20 },
+    { "id": "SEO Expert", "label": "SEO Expert", "rank": 21 },
+    { "id": "Social Media Marketer", "label": "Social Media Marketer", "rank": 22 }
+  ]
+}
+

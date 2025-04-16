@@ -5,12 +5,12 @@ export const FALLBACK_MODE = false;
 // const ONLINE_SOCKET_BASE_URL = "https://ai-chat-interface-production.up.railway.app";
 
 // local testing 
-const ONLINE_API_BASE_URL = "https://server-628309.hostingwithgda.com:3010/api";
-const ONLINE_SOCKET_BASE_URL = "https://server-628309.hostingwithgda.com:3010";
+const ONLINE_API_BASE_URL = "https://graceful-presence-production.up.railway.app/api";
+const ONLINE_SOCKET_BASE_URL = "https://graceful-presence-production.up.railway.app";
 
 
-const FALLBACK_API_BASE_URL = "https://ai-chat-interface-production.up.railway.app/api"; 
-const FALLBACK_SOCKET_BASE_URL = "https://ai-chat-interface-production.up.railway.app";
+const FALLBACK_API_BASE_URL = "https://graceful-presence-production.up.railway.app/api"; 
+const FALLBACK_SOCKET_BASE_URL = "https://graceful-presence-production.up.railway.app";
 
 
 export const RECONNECTION_CONFIG = {

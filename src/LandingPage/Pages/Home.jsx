@@ -25,7 +25,7 @@ import ethiopiaFlag from "../../assets/ethiopia-flag.webp";
 import kenyaFlag from "../../assets/kenya-flag.webp";
 import dubaiFlag from "../../assets/uae-flag.webp";
 import rwandaFlag from "../../assets/rwanda-flag.webp";
-import tanzaniaFlag from "../../assets/tanzania-flag.webp";  
+import tanzaniaFlag from "../../assets/Partners/ogilvy.jpeg";  
 import senegalFlag from "../../assets/senegal-flag.webp";
 import ghanaFlag from "../../assets/ghana-flag.webp";
 

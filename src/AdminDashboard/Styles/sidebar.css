@@ -1,0 +1,20 @@
+@layer utilities {
+    @keyframes typing {
+      from {
+        max-width: 0;
+      }
+      to {
+        max-width: 200px;
+      }
+    }
+  
+    .typing {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      max-width: 0;
+      animation: typing 0.5s steps(20, end) forwards;
+      animation-delay: 300ms;
+    }
+  }
+  

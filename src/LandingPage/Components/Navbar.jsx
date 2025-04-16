@@ -25,8 +25,8 @@ import {
 } from "lucide-react";
 import Toggle from "../../Utils/ToogleButton";
 import logo from "../../assets/logo.png";
-import logofv from "../../assets/Partners/image.png";
-import skill from "../../assets/spinner/image.png";
+import logofv from "../../assets/Partners/wix.png";
+import skill from "../../assets/Partners/safaricom.jpeg";
 import adcraft from "../../assets/adcraft.jpg";
 
 // ClassNames component to replace the cn utility function

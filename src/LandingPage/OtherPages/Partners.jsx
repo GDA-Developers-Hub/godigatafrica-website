@@ -14,7 +14,7 @@ import brand7 from "../../assets/mi-vida.png";
 import brand8 from "../../assets/rubis.png";
 import image01 from "../../assets/meta.png";
 import image02 from "../../assets/tiktok.png";
-import image03 from "../../assets/google.png";
+import image03 from "../../assets/Partners/salesforce.jpeg";
 import image04 from "../../assets/openai.webp";
 
 // Mock client brand logos
