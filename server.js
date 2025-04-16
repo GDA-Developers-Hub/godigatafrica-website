@@ -360,18 +360,32 @@ io.on("connection", (socket) => {
       
       const agentsAvailable = onlineAgents[0].count > 0;
       
+      // Create room object with proper 'active' field for all agents
+      const newRoomData = {
+        id: roomId,
+        userName: userName || "User",
+        lastMessage: "Waiting for assistance...",
+        active: true,
+        status: 'active',
+        waitTime: "Just now",
+        lastActivityTimestamp: new Date().toISOString(),
+        assignedAgentId: null // Not assigned to any agent yet
+      };
+      
+      // Add to in-memory map for realtime access
+      chatRooms.set(roomId, newRoomData);
+      
       if (agentsAvailable) {
-        // Notify all active agents about the new room
-        const availableRoom = {
-          id: roomId,
-          userName: userName || "User",
-          lastMessage: room.lastMessage,
-          waitTime: getWaitTime(room.createdAt)
-        };
+        console.log("Notifying all agents about new support request room:", roomId);
         
+        // Notify all active agents about the new room using room_updated event
         for (const [agentSocketId, agentInfo] of activeAgents.entries()) {
-          io.to(agentSocketId).emit("available_rooms", [availableRoom]);
+          console.log(`Sending room_updated to agent: ${agentSocketId}`);
+          io.to(agentSocketId).emit("room_updated", newRoomData);
         }
+        
+        // Also update full available rooms list for all agents
+        updateAvailableRoomsForAllAgents();
       } else {
         // No agents available, notify the user
         io.to(socket.id).emit("no_agents_available");
@@ -1017,6 +1031,27 @@ io.on("connection", (socket) => {
         success: false, 
         error: "Failed to update status"
       });
+    }
+  });
+
+  // Agent requests available rooms list
+  socket.on("get_available_rooms", async () => {
+    console.log(`Agent ${socket.id} explicitly requested available rooms`);
+    
+    try {
+      // Get personalized list of available rooms for this agent
+      const availableRooms = await getAvailableRooms(socket.id);
+      console.log(`Sending ${availableRooms.length} available rooms to agent ${socket.id}`);
+      
+      // Send debug info about rooms
+      availableRooms.forEach(room => {
+        console.log(`Room ${room.id.substring(0, 8)}: active=${room.active}, assigned=${room.assignedAgentId ? 'yes' : 'no'}`);
+      });
+      
+      // Send to requesting agent
+      socket.emit("available_rooms", availableRooms);
+    } catch (error) {
+      console.error(`Error getting available rooms for agent ${socket.id}:`, error);
     }
   });
 });

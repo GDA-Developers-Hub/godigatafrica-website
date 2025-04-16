@@ -10,7 +10,7 @@ import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import io from "socket.io-client";
-import { useAgentAuth } from "../Contexts/AgentAuthContext.jsx";
+import { useAgentAuth } from "../Auth/AgentAuthContext.jsx";
 import Swal from "sweetalert2";
 
 // Import sound files
@@ -102,13 +102,22 @@ const Agent = () => {
 
   // Function to filter and sort active conversations
   const filterActiveRooms = (rooms) => {
-    return rooms
+    console.log("Filtering rooms:", rooms.length, "Socket ID:", socket?.id);
+    
+    const filtered = rooms
       .filter(room => {
+        // Log room details for debugging
+        const isActive = room.active;
+        const hasNoAgent = !room.assignedAgentId;
+        const isAssignedToMe = room.assignedAgentId === socket?.id;
+        const shouldKeep = isActive && (hasNoAgent || isAssignedToMe);
+        
+        console.log(`Room ${room.id.substring(0, 8)}: active=${isActive}, assigned=${room.assignedAgentId ? 'yes' : 'no'}, mine=${isAssignedToMe}, keep=${shouldKeep}`);
+        
         // Keep a room if:
         // 1. It's active AND
         // 2. Either it has no assigned agent (waiting for pickup) OR it's assigned to current agent
-        return room.active && 
-               (!room.assignedAgentId || room.assignedAgentId === socket?.id);
+        return shouldKeep;
       })
       .sort((a, b) => {
         // Sort by most recent activity
@@ -116,6 +125,9 @@ const Agent = () => {
         const bTime = b.lastActivityTimestamp ? new Date(b.lastActivityTimestamp).getTime() : 0;
         return bTime - aTime; // Newest first
       });
+    
+    console.log("Filtered result:", filtered.length, "rooms");
+    return filtered;
   };
 
   // Function to sort all conversations by activity timestamp
@@ -244,6 +256,7 @@ const Agent = () => {
     // Socket event listeners
     newSocket.on("connect", () => {
       console.log("Connected to socket server with ID:", newSocket.id);
+      console.log("Connection URL:", SOCKET_BASE_URL);
       setIsConnected(true);
       
       // Register as agent with agent name
@@ -251,6 +264,10 @@ const Agent = () => {
         agentId: newSocket.id, 
         agentName: agentName 
       });
+      
+      // Explicitly request any active chats
+      console.log("Requesting active chats on connection");
+      newSocket.emit("get_available_rooms");
     });
 
     // Listen for room update events
@@ -409,6 +426,23 @@ const Agent = () => {
     newSocket.on("available_rooms", (rooms) => {
       console.log("Received available rooms:", rooms);
       
+      // Add detailed debugging info
+      console.log("Socket ID:", newSocket.id);
+      console.log("Room details:", rooms.map(r => ({
+        id: r.id.substring(0, 8),
+        active: r.active,
+        assigned: r.assignedAgentId ? 
+          (r.assignedAgentId === newSocket.id ? "to me" : "to other") : "unassigned"
+      })));
+      
+      // Verify the filtering function works correctly
+      const filteredRooms = filterActiveRooms(rooms);
+      console.log("Filtered rooms:", filteredRooms.length);
+      console.log("Filter details:", filteredRooms.map(r => ({
+        id: r.id.substring(0, 8),
+        reason: (!r.assignedAgentId ? "unassigned" : "assigned to me")
+      })));
+      
       // Store all rooms and sort them by activity time
       const sortedRooms = sortByActivityTime(rooms);
       setAllRooms(sortedRooms);
@@ -425,12 +459,12 @@ const Agent = () => {
     });
 
     newSocket.on("new_message", (message) => {
-      console.log("🔔 RECEIVED NEW MESSAGE EVENT:", message);
-      debugLog("RECEIVED NEW MESSAGE:", message);
+      console.log("🔍 MESSAGE FLOW - Received from " + 
+        (message.role === 'user' ? 'Assistant/User' : 'Agent'), 
+        message.content?.substring(0, 30) + '...');
       
       if (!message || !message.roomId) {
         console.error("❌ ERROR: Invalid message format, missing roomId", message);
-        debugLog("ERROR: Invalid message format, missing roomId", message);
         return;
       }
       
@@ -438,17 +472,14 @@ const Agent = () => {
       if (!message.role) {
         message.role = message.senderId === newSocket.id ? "agent" : "user";
         console.log(`🔄 Assigned role: ${message.role} for message`);
-        debugLog("Assigned role:", message.role);
       }
       
       // Log comparison of roomIds for debugging
       console.log(`🔍 Message roomId: ${message.roomId}, Active room: ${activeRoom?.id}, Match: ${message.roomId === activeRoom?.id}`);
-      debugLog(`Message roomId: ${message.roomId}, Active room: ${activeRoom?.id}`);
       
       // Add message to chat if this is for our active room
       if (activeRoom && message.roomId === activeRoom.id) {
         console.log("📝 Adding message to active chat");
-        debugLog("Adding message to active chat");
         
         // Check for duplicates before adding
         setMessages(prev => {
@@ -459,12 +490,10 @@ const Agent = () => {
           
           if (duplicate) {
             console.log("⚠️ Skipping duplicate message");
-            debugLog("Skipping duplicate message");
             return prev;
           }
           
           console.log("✅ Added message to messages state");
-          debugLog("Added message to messages state");
           return [...prev, message];
         });
         
@@ -479,7 +508,6 @@ const Agent = () => {
       
       // Important: ALWAYS update the sidebar regardless of active room
       console.log("🔄 Updating sidebar for message:", message.content?.substring(0, 20));
-      debugLog("Updating room in sidebar for message:", message.content?.substring(0, 20));
       
       const msgRoomId = message.roomId;
       const now = new Date().toISOString();
@@ -488,7 +516,6 @@ const Agent = () => {
       setAllRooms(prev => {
         // Check if room exists in our list
         const roomExists = prev.some(room => room.id === msgRoomId);
-        debugLog(`Room ${msgRoomId} exists in allRooms: ${roomExists}`);
         console.log(`🔍 Room ${msgRoomId} exists in allRooms: ${roomExists}`);
         
         let updated;
@@ -502,7 +529,6 @@ const Agent = () => {
                 lastActivityTimestamp: message.timestamp || now,
                 unread: activeRoom?.id !== msgRoomId
               };
-              debugLog("Updated room in allRooms:", room.id);
               console.log("✅ Updated room in allRooms:", room.id);
               return newState;
             }
@@ -510,7 +536,6 @@ const Agent = () => {
           });
         } else {
           // Room doesn't exist yet, create a placeholder until we get full room data
-          debugLog("Room not found in allRooms, creating placeholder");
           console.log("🆕 Room not found in allRooms, creating placeholder");
           const newRoom = {
             id: msgRoomId,
@@ -530,7 +555,6 @@ const Agent = () => {
       setAvailableRooms(prev => {
         // Check if the room exists
         const roomExists = prev.some(room => room.id === msgRoomId);
-        debugLog(`Room ${msgRoomId} exists in availableRooms: ${roomExists}`);
         console.log(`🔍 Room ${msgRoomId} exists in availableRooms: ${roomExists}`);
         
         let updated;
@@ -544,7 +568,6 @@ const Agent = () => {
                 lastActivityTimestamp: message.timestamp || now,
                 unread: activeRoom?.id !== msgRoomId
               };
-              debugLog("Updated room in availableRooms:", room.id);
               console.log("✅ Updated room in availableRooms:", room.id);
               return newState;
             }
@@ -554,7 +577,6 @@ const Agent = () => {
           // Check if we should add this to available rooms
           const isActiveRoom = activeRoom?.id === msgRoomId;
           if (!isActiveRoom) {
-            debugLog("Room not found in availableRooms, creating placeholder");
             console.log("🆕 Room not found in availableRooms, creating placeholder");
             const newRoom = {
               id: msgRoomId,
@@ -576,7 +598,6 @@ const Agent = () => {
       // Always play notification for incoming user messages
       if (message.role === 'user' && message.senderId !== newSocket.id) {
         console.log("🔊 Playing notification sound for user message");
-        debugLog("Playing notification for message from:", message.senderId);
         
         // Play sound for all messages not from current user
         if (notificationSound) {
@@ -602,7 +623,6 @@ const Agent = () => {
               notification.close();
             };
             
-            debugLog("Browser notification shown for message");
             console.log("🔔 Browser notification shown");
           } catch (err) {
             console.warn("Failed to show notification:", err);
@@ -656,6 +676,50 @@ const Agent = () => {
       // ... rest of request handling
     });
 
+    // Add a separate useEffect for user connection events
+    useEffect(() => {
+      if (socket) {
+        // Listen for user socket events
+        const userJoinHandler = (data) => {
+          console.log("👤 USER JOINED CHAT:", data);
+          
+          // Show notification to agent
+          Swal.fire({
+            title: 'User Connected',
+            text: `${data.userName || 'Customer'} has joined the chat`,
+            icon: 'info',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+          });
+        };
+        
+        const userDisconnectHandler = (data) => {
+          console.log("👤 USER DISCONNECTED:", data);
+          
+          // Show notification to agent
+          Swal.fire({
+            title: 'User Disconnected',
+            text: `${data.userName || 'Customer'} has disconnected from the chat`,
+            icon: 'warning',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+          });
+        };
+        
+        socket.on("user_joined", userJoinHandler);
+        socket.on("user_disconnected", userDisconnectHandler);
+        
+        return () => {
+          socket.off("user_joined", userJoinHandler);
+          socket.off("user_disconnected", userDisconnectHandler);
+        };
+      }
+    }, [socket]);
+
     return () => {
       if (inactivityTimer) {
         console.log("Agent: Clearing inactivity timer due to component unmount");
@@ -698,11 +762,15 @@ const Agent = () => {
     if (socket) {
       console.log(`Agent: Joining room ${room.id}`);
       
-      // Immediately mark room as active in local state
+      // Immediately mark room as active in local state and assigned to this agent
       setAllRooms(prev => {
         return prev.map(r => {
           if (r.id === room.id) {
-            return { ...r, active: true };
+            return { 
+              ...r, 
+              active: true,
+              assignedAgentId: socket.id 
+            };
           }
           return r;
         });
@@ -711,7 +779,11 @@ const Agent = () => {
       setAvailableRooms(prev => {
         const updated = prev.map(r => {
           if (r.id === room.id) {
-            return { ...r, active: true };
+            return { 
+              ...r, 
+              active: true,
+              assignedAgentId: socket.id
+            };
           }
           return r;
         });
@@ -729,6 +801,7 @@ const Agent = () => {
       setActiveRoom({
         ...room,
         active: true,
+        assignedAgentId: socket.id,
         lastActivityTimestamp: new Date().toISOString()
       });
       
@@ -916,11 +989,11 @@ const Agent = () => {
   // Play notification sound based on settings
   const playNotificationSound = () => {
     if (!notificationsEnabled) {
-      debugLog("Notifications disabled, not playing sound");
+      console.log("Notifications disabled, not playing sound");
       return;
     }
     
-    debugLog("Playing notification sound");
+    console.log("Playing notification sound");
     let soundToPlay;
     
     // Set the source based on selected sound
@@ -942,7 +1015,7 @@ const Agent = () => {
     audio.volume = notificationVolume / 100;
     
     audio.play().catch(error => {
-      debugLog("Error playing notification sound:", error);
+      console.warn("Error playing notification sound:", error);
     });
   };
 
@@ -984,6 +1057,34 @@ const Agent = () => {
     const timestamp = new Date().toLocaleTimeString();
     console.log(`[${timestamp}] ${message}`, data || '');
   };
+
+  // Add explicit request for available rooms after connection
+  useEffect(() => {
+    if (socket && socket.connected) {
+      console.log("CONNECTED - Explicitly requesting available rooms");
+      // Request available rooms list
+      socket.emit("get_available_rooms");
+      
+      // Set up periodic refresh
+      const refreshInterval = setInterval(() => {
+        console.log("Refreshing available rooms");
+        socket.emit("get_available_rooms");
+      }, 15000); // Refresh every 15 seconds
+      
+      return () => clearInterval(refreshInterval);
+    }
+  }, [socket, isConnected]);
+  
+  // Add check for SOCKET_BASE_URL validity
+  useEffect(() => {
+    console.log("SOCKET_BASE_URL check:", SOCKET_BASE_URL);
+    try {
+      const url = new URL(SOCKET_BASE_URL);
+      console.log("Socket URL is valid:", url.href);
+    } catch (e) {
+      console.error("INVALID SOCKET URL:", SOCKET_BASE_URL, e);
+    }
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-900">
@@ -1178,12 +1279,26 @@ const Agent = () => {
             <h3 className="text-sm font-semibold text-gray-400">
               {showAllConversations ? "ALL CONVERSATIONS" : "ACTIVE CONVERSATIONS"}
             </h3>
-            <button 
-              onClick={toggleConversationView}
-              className="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-blue-300"
-            >
-              {showAllConversations ? "Show Active" : "View All"}
-            </button>
+            <div className="flex space-x-1">
+              <button 
+                onClick={toggleConversationView}
+                className="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-blue-300"
+              >
+                {showAllConversations ? "Show Active" : "View All"}
+              </button>
+              <button 
+                onClick={() => {
+                  console.log("Manually refreshing available rooms");
+                  if (socket && socket.connected) {
+                    socket.emit("get_available_rooms");
+                  }
+                }}
+                className="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-green-300"
+                title="Refresh conversations list"
+              >
+                Refresh
+              </button>
+            </div>
           </div>
           
           {(showAllConversations ? allRooms : availableRooms).length > 0 ? (
@@ -1201,11 +1316,17 @@ const Agent = () => {
                   <div className="flex justify-between items-center">
                     <span className="font-medium text-gray-200">{room.userName || "Customer"}</span>
                     <span className={`text-xs px-2 py-1 rounded-full ${
-                      room.active 
-                        ? "bg-green-800 text-green-200" 
-                        : "bg-gray-600 text-gray-300"
+                      !room.active 
+                        ? "bg-gray-600 text-gray-300"
+                        : room.assignedAgentId
+                          ? "bg-blue-800 text-blue-200"
+                          : "bg-green-800 text-green-200"
                     }`}>
-                      {room.active ? (room.waitTime || "Active") : "Inactive"}
+                      {!room.active 
+                        ? "Inactive" 
+                        : room.assignedAgentId 
+                          ? (room.assignedAgentId === socket?.id ? "Your Chat" : "Assigned") 
+                          : "Waiting"}
                     </span>
                   </div>
                   <p className="text-xs text-gray-400 mt-1 truncate">
@@ -1315,14 +1436,15 @@ const Agent = () => {
               <p className="mb-6">Select a support request from the sidebar to start assisting customers.</p>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="bg-gray-800 p-3 rounded-lg border border-gray-700">
-                  <div className="font-medium text-gray-200 mb-1">Active Chats</div>
-                  <div className="text-2xl font-bold text-white">{availableRooms.length}</div>
+                  <div className="font-medium text-gray-200 mb-1">Waiting Chats</div>
+                  <div className="text-2xl font-bold text-white">
+                    {availableRooms.filter(r => r.active && !r.assignedAgentId).length}
+                  </div>
                 </div>
                 <div className="bg-gray-800 p-3 rounded-lg border border-gray-700">
-                  <div className="font-medium text-gray-200 mb-1">Status</div>
-                  <div className={`font-medium flex items-center ${isAvailable ? 'text-green-500' : 'text-gray-500'}`}>
-                    <div className={`w-2 h-2 ${isAvailable ? 'bg-green-500' : 'bg-gray-500'} rounded-full mr-1`}></div>
-                    {isAvailable ? 'Available' : 'Busy'}
+                  <div className="font-medium text-gray-200 mb-1">Your Chats</div>
+                  <div className="text-2xl font-bold text-white">
+                    {availableRooms.filter(r => r.active && r.assignedAgentId === socket?.id).length}
                   </div>
                 </div>
               </div>
