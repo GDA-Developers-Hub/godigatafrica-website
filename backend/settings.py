@@ -55,6 +55,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1', 
     'localhost', 
     'hostingwithgda.com'
+    'godigitalafrica.com'
 ]
 
 
@@ -72,6 +73,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://go-digital-africa-production.up.railway.app",
     "http://hostingwithgda.com/website/",
     "https://hostingwithgda.com",
+    "https://godigitalafrica.com/",
 ]
 
 
@@ -87,6 +89,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://hostingwithgda.com",
     "http://hostingwithgda.com/website/",
     "https://godigatafrica-website-production.up.railway.app",
+    "https://godigitalafrica.com/",
 ]
 
 
