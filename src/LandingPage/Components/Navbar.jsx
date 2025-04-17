@@ -27,7 +27,7 @@ import Toggle from "../../Utils/ToogleButton";
 import logo from "../../assets/logo.png";
 import logofv from "../../assets/Partners/image.png";
 import skill from "../../assets/skill-link-logo.png";
-import adcraft from "../../assets/adcraft.jpg";
+import linkly from "../../assets/Linkly.jpg";
 
 // ClassNames component to replace the cn utility function
 const ClassNames = ({ children, className = "", conditionalClasses = {} }) => {
@@ -43,7 +43,7 @@ const ClassNames = ({ children, className = "", conditionalClasses = {} }) => {
 const partnersList = [
   { name: "SwiftSkillSquad", logo: logofv, alt: "Google Partner Logo" },
   { name: "SkillLink", logo: skill, alt: "Facebook Partner Logo" },
-  { name: "AdCraft", logo: adcraft, alt: "Microsoft Advertising Logo" },
+  { name: "Linkly", logo: linkly, alt: "Linkly Logo" },
 ]
 
 
@@ -210,8 +210,8 @@ const Navbar = () => {
                     src={logo}
                     alt="logo"
                     className={`rounded transition-all duration-500 ${
-                      scrolled ? "h-10 w-12" : "h-20 w-24"
-                    } sm:${scrolled ? "h-10 w-12" : "h-20 w-20"}`}
+                      scrolled ? "h-10 w-12" : "h-22 w-22"
+                    } sm:${scrolled ? "h-10 w-12" : "h-20 w-19"}`}
                   />
                 </div>
               </div>

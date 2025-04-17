@@ -263,7 +263,7 @@ export default function Home() {
       </div>
 
       {/* Content Container */}
-      <div className="flex items-center h-full w-full mx-auto px-6 md:px-12 relative z-10">
+      <div className="flex items-center h-full w-full mx-auto px-6 md:px-12 relative z-10 mt-5">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 w-full">
           {/* Left Column */}
           <motion.div
