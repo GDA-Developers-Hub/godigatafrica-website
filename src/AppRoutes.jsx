@@ -9,29 +9,29 @@ import "./root.css";
 
 import { AgentAuthProvider } from "./ChatInterface/Auth/AgentAuthContext";
 
-const AdminDashboard = lazy(() => import("./AdminDashboard/Components/AdminDashboard"));
-const RegisterAdmin = lazy(() => import("./AdminDashboard/Auth/RegisterAdmin"));
-const Login = lazy(() => import("./AdminDashboard/Auth/Login"));
-const ForgotPassword = lazy(() => import("./AdminDashboard/Auth/ForgotPassword"));
-const ResetPassword = lazy(() => import('./AdminDashboard/Auth/ForgotPassword').then(module => ({ default: module.ResetPassword })));
-const AddBlog = lazy(() => import("./AdminDashboard/Pages/AddBlog"));
-const AdminSubscribers = lazy(() => import("./AdminDashboard/Pages/Subscribers.jsx"));
-const AdminReviews = lazy(() => import("./AdminDashboard/Pages/Reviews.jsx"));
-const AdminNews = lazy(() => import("./AdminDashboard/Pages/News.jsx"));
-const AdminCareers = lazy(() => import("./AdminDashboard/Pages/Careers.jsx"));
-const AdminAwards = lazy(() => import("./AdminDashboard/Pages/Awards.jsx"));
-const DashboardPage = lazy(() => import("./AdminDashboard/Pages/DashboardPage"));
-const SettingsPage = lazy(() => import("./AdminDashboard/Pages/Settings/SettingsPage.jsx"));
-const Consultations = lazy(() => import("./AdminDashboard/Pages/Consultations"));
-const Logout = lazy(() => import("./AdminDashboard/Pages/Logout"));
-const Messages = lazy(() => import("./AdminDashboard/Pages/Messages"));
-const Proposal = lazy(() => import("./AdminDashboard/Pages/Proposals"));
-const CaseStudies = lazy(() => import("./AdminDashboard/Pages/CaseStudies.jsx"));
-const CareerApplications = lazy(() => import("./AdminDashboard/Pages/CareerApplications.jsx"));
-const TeamManagement = lazy(() => import("./AdminDashboard/Pages/TeamManagement.jsx"));
-const NewsLetterAdmin = lazy(() => import("./AdminDashboard/Pages/NewsLetter/NewsLetterAdmin.jsx"));
-const AgentDashboard = lazy(() => import("./AdminDashboard/Components/AgentDashboard.jsx"));
-const AgentAdminLogin = lazy(() => import("./ChatInterface/Auth/AdminLogin.jsx"));
+import AdminDashboard from "./AdminDashboard/Components/AdminDashboard";
+import RegisterAdmin from "./AdminDashboard/Auth/RegisterAdmin";
+import Login from "./AdminDashboard/Auth/Login";
+import ForgotPassword from "./AdminDashboard/Auth/ForgotPassword";
+import { ResetPassword } from './AdminDashboard/Auth/ForgotPassword';
+import AddBlog from "./AdminDashboard/Pages/AddBlog";
+import AdminSubscribers from "./AdminDashboard/Pages/Subscribers.jsx";
+import AdminReviews from "./AdminDashboard/Pages/Reviews.jsx";
+import AdminNews from "./AdminDashboard/Pages/News.jsx";
+import AdminCareers from "./AdminDashboard/Pages/Careers.jsx";
+import AdminAwards from "./AdminDashboard/Pages/Awards.jsx";
+import DashboardPage from "./AdminDashboard/Pages/DashboardPage";
+import SettingsPage from "./AdminDashboard/Pages/Settings/SettingsPage.jsx";
+import Consultations from "./AdminDashboard/Pages/Consultations";
+import Logout from "./AdminDashboard/Pages/Logout";
+import Messages from "./AdminDashboard/Pages/Messages";
+import Proposal from "./AdminDashboard/Pages/Proposals";
+import CaseStudies from "./AdminDashboard/Pages/CaseStudies.jsx";
+import CareerApplications from "./AdminDashboard/Pages/CareerApplications.jsx";
+import TeamManagement from "./AdminDashboard/Pages/TeamManagement.jsx";
+import NewsLetterAdmin from "./AdminDashboard/Pages/NewsLetter/NewsLetterAdmin.jsx";
+import AgentDashboard from "./AdminDashboard/Components/AgentDashboard.jsx";
+import AgentAdminLogin from "./ChatInterface/Auth/AdminLogin.jsx";
 
 // Chat interface components
 const ApiKeyForm = lazy(() => import("./ChatInterface/Components/ApiKeyForm"));
@@ -315,7 +315,7 @@ function AppContent() {
 
 function AppRoutes() {
   return (
-    <Router basename="/website">
+    <Router>
       <AppContent />
     </Router>
   );

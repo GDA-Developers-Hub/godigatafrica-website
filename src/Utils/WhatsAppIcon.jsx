@@ -7,7 +7,7 @@ const WhatsAppIcon = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [isBubbleHidden, setIsBubbleHidden] = useState(false);
-  const phoneNumber = "254723479444";
+  const phoneNumber = "254720222249";
 
   useEffect(() => {
     const savedState = localStorage.getItem("whatsappBubbleHidden");
@@ -21,9 +21,8 @@ const WhatsAppIcon = () => {
   }, [isBubbleHidden]);
 
   const toggleChat = () => {
-    setIsOpen(!isOpen);
+    setIsOpen(!isOpen); 
   };
-
   const hideBubble = () => {
     setIsBubbleHidden(true);
     setIsOpen(false);
@@ -88,7 +87,7 @@ const WhatsAppIcon = () => {
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type a message..."
+              placeholder="Type a message..."  
               className="flex-1 border border-gray-300 rounded-full py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-[#25D366] text-sm font-medium text-black bg-white"
             />
             <button

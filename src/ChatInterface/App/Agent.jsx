@@ -16,7 +16,7 @@ import Swal from "sweetalert2";
 // Import sound files
 import notificationSound from '../../assets/sounds/chime.mp3';
 import chimeSound from '../../assets/sounds/chime.mp3';
-import bellSound from '../../assets/sounds/chime.mp3';
+import bellSound from '../../assets/sounds/notification-18-270129 (1).mp3';
 
 function ChatMessage({ message }) {
   const isUser = message.role === "user";
@@ -89,8 +89,6 @@ const Agent = () => {
   const [notificationVolume, setNotificationVolume] = useState(parseInt(localStorage.getItem('notificationVolume') || '80'));
   const [lastActivity, setLastActivity] = useState(Date.now());
   const [inactivityTimer, setInactivityTimer] = useState(null);
-  const [showAllConversations, setShowAllConversations] = useState(false);
-  const [allRooms, setAllRooms] = useState([]);
   const chatEndRef = useRef(null);
   const notificationAudioRef = useRef(null);
   const navigate = useNavigate();
@@ -98,29 +96,7 @@ const Agent = () => {
 
   // Constants
   const INACTIVITY_TIMEOUT = 10 * 60 * 1000; // 10 minutes in milliseconds
-  const RECENT_CONVERSATION_LIMIT = 10 * 60 * 1000; // 10 minutes in milliseconds
-
-  // Function to filter and sort active conversations
-  const filterActiveRooms = (rooms) => {
-    return rooms
-      .filter(room => room.active)
-      .sort((a, b) => {
-        // Sort by most recent activity
-        const aTime = a.lastActivityTimestamp ? new Date(a.lastActivityTimestamp).getTime() : 0;
-        const bTime = b.lastActivityTimestamp ? new Date(b.lastActivityTimestamp).getTime() : 0;
-        return bTime - aTime; // Newest first
-      });
-  };
-
-  // Function to sort all conversations by activity timestamp
-  const sortByActivityTime = (rooms) => {
-    return [...rooms].sort((a, b) => {
-      const aTime = a.lastActivityTimestamp ? new Date(a.lastActivityTimestamp).getTime() : 0;
-      const bTime = b.lastActivityTimestamp ? new Date(b.lastActivityTimestamp).getTime() : 0;
-      return bTime - aTime; // Newest first
-    });
-  };
-
+  
   // Function to handle chat inactivity timeout
   const setupInactivityTimer = () => {
     console.log("Agent: Setting up inactivity timer for 10 minutes");
@@ -247,72 +223,6 @@ const Agent = () => {
       });
     });
 
-    // Listen for room update events
-    newSocket.on("room_updated", (updatedRoom) => {
-      debugLog("Room updated event:", updatedRoom);
-      
-      if (!updatedRoom || !updatedRoom.id) {
-        debugLog("ERROR: Invalid room update format");
-        return;
-      }
-      
-      // Check if this is an active room update
-      const isForActiveRoom = activeRoom?.id === updatedRoom.id;
-      debugLog(`Update is for active room: ${isForActiveRoom}`);
-      
-      // Update in all rooms list first
-      setAllRooms(prev => {
-        const roomExists = prev.some(room => room.id === updatedRoom.id);
-        debugLog(`Room ${updatedRoom.id} exists in allRooms: ${roomExists}`);
-        
-        let updated;
-        if (roomExists) {
-          updated = prev.map(room => 
-            room.id === updatedRoom.id ? { ...room, ...updatedRoom } : room
-          );
-        } else {
-          updated = [...prev, updatedRoom];
-        }
-        
-        return sortByActivityTime(updated);
-      });
-      
-      // Update in available rooms
-      setAvailableRooms(prev => {
-        const roomExists = prev.some(room => room.id === updatedRoom.id);
-        debugLog(`Room ${updatedRoom.id} exists in availableRooms: ${roomExists}`);
-        
-        // Only keep active rooms in this list
-        let updated;
-        if (roomExists) {
-          updated = prev.map(room => 
-            room.id === updatedRoom.id ? { ...room, ...updatedRoom } : room
-          );
-        } else if (updatedRoom.active) {
-          updated = [...prev, updatedRoom];
-        } else {
-          updated = prev;
-        }
-        
-        return filterActiveRooms(updated);
-      });
-      
-      // If this update is for active room, update it
-      if (isForActiveRoom) {
-        debugLog("Updating active room state");
-        setActiveRoom(prev => ({ ...prev, ...updatedRoom, unread: false }));
-      }
-      
-      // Check if we need to play a notification
-      const isUnread = updatedRoom.unread === true;
-      const hasNewMessage = activeRoom?.lastMessage !== updatedRoom.lastMessage;
-      
-      if ((isUnread || (hasNewMessage && !isForActiveRoom))) {
-        debugLog("Playing notification for room update");
-        playNotificationSound();
-      }
-    });
-
     // Listen for room leave confirmations
     newSocket.on("room_left", (data) => {
       console.log("Agent: Room left confirmation:", data);
@@ -321,8 +231,7 @@ const Agent = () => {
       if (data.success) {
         // Update available rooms list if provided
         if (data.availableRooms) {
-          setAllRooms(sortByActivityTime(data.availableRooms));
-          setAvailableRooms(filterActiveRooms(data.availableRooms));
+          setAvailableRooms(data.availableRooms);
         }
       } else {
         console.error("Agent: Error leaving room:", data.error);
@@ -397,206 +306,36 @@ const Agent = () => {
 
     newSocket.on("available_rooms", (rooms) => {
       console.log("Received available rooms:", rooms);
-      
-      // Store all rooms and sort them by activity time
-      const sortedRooms = sortByActivityTime(rooms);
-      setAllRooms(sortedRooms);
-      
-      // Filter active rooms for the main view
-      const activeRooms = filterActiveRooms(rooms);
-      
-      // Play notification if there are new active rooms
-      if (activeRooms.length > availableRooms.length) {
+      if (rooms.length > availableRooms.length) {
         playNotificationSound();
       }
-      
-      setAvailableRooms(activeRooms);
+      setAvailableRooms(rooms);
     });
 
     newSocket.on("new_message", (message) => {
-      console.log("🔔 RECEIVED NEW MESSAGE EVENT:", message);
-      debugLog("RECEIVED NEW MESSAGE:", message);
-      
-      if (!message || !message.roomId) {
-        console.error("❌ ERROR: Invalid message format, missing roomId", message);
-        debugLog("ERROR: Invalid message format, missing roomId", message);
-        return;
-      }
+      console.log("Agent: Received new message:", message);
       
       // Ensure the message has a valid role
       if (!message.role) {
-        message.role = message.senderId === newSocket.id ? "agent" : "user";
-        console.log(`🔄 Assigned role: ${message.role} for message`);
-        debugLog("Assigned role:", message.role);
+        console.log("Agent: Adding missing role to message");
+        if (message.senderId === newSocket.id) {
+          message.role = "agent";
+        } else {
+          message.role = "user";
+        }
       }
       
-      // Log comparison of roomIds for debugging
-      console.log(`🔍 Message roomId: ${message.roomId}, Active room: ${activeRoom?.id}, Match: ${message.roomId === activeRoom?.id}`);
-      debugLog(`Message roomId: ${message.roomId}, Active room: ${activeRoom?.id}`);
-      
-      // Add message to chat if this is for our active room
-      if (activeRoom && message.roomId === activeRoom.id) {
-        console.log("📝 Adding message to active chat");
-        debugLog("Adding message to active chat");
+      // Only add messages that aren't from the current agent
+      // This prevents duplicate messages when we send and then receive our own message back
+      if (message.senderId !== newSocket.id) {
+        console.log(`Agent: Adding message from ${message.role} to chat`);
+        setMessages((prev) => [...prev, message]);
         
-        // Check for duplicates before adding
-        setMessages(prev => {
-          const duplicate = prev.some(m => 
-            (m.id && m.id === message.id) || 
-            (m.content === message.content && m.senderId === message.senderId)
-          );
-          
-          if (duplicate) {
-            console.log("⚠️ Skipping duplicate message");
-            debugLog("Skipping duplicate message");
-            return prev;
-          }
-          
-          console.log("✅ Added message to messages state");
-          debugLog("Added message to messages state");
-          return [...prev, message];
-        });
+        // Play notification sound for incoming messages
+        playNotificationSound();
         
-        // Make sure chat scrolls to bottom
-        setTimeout(() => {
-          chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
-        
-        // Reset inactivity timer
+        // Update activity timestamp when receiving message
         updateActivity();
-      }
-      
-      // Important: ALWAYS update the sidebar regardless of active room
-      console.log("🔄 Updating sidebar for message:", message.content?.substring(0, 20));
-      debugLog("Updating room in sidebar for message:", message.content?.substring(0, 20));
-      
-      const msgRoomId = message.roomId;
-      const now = new Date().toISOString();
-      
-      // First update allRooms to ensure we have the room
-      setAllRooms(prev => {
-        // Check if room exists in our list
-        const roomExists = prev.some(room => room.id === msgRoomId);
-        debugLog(`Room ${msgRoomId} exists in allRooms: ${roomExists}`);
-        console.log(`🔍 Room ${msgRoomId} exists in allRooms: ${roomExists}`);
-        
-        let updated;
-        if (roomExists) {
-          updated = prev.map(room => {
-            if (room.id === msgRoomId) {
-              const newState = {
-                ...room,
-                lastMessage: message.content,
-                active: true,
-                lastActivityTimestamp: message.timestamp || now,
-                unread: activeRoom?.id !== msgRoomId
-              };
-              debugLog("Updated room in allRooms:", room.id);
-              console.log("✅ Updated room in allRooms:", room.id);
-              return newState;
-            }
-            return room;
-          });
-        } else {
-          // Room doesn't exist yet, create a placeholder until we get full room data
-          debugLog("Room not found in allRooms, creating placeholder");
-          console.log("🆕 Room not found in allRooms, creating placeholder");
-          const newRoom = {
-            id: msgRoomId,
-            userName: message.senderName || "User",
-            lastMessage: message.content,
-            active: true,
-            lastActivityTimestamp: message.timestamp || now,
-            unread: true
-          };
-          updated = [...prev, newRoom];
-        }
-        
-        return sortByActivityTime(updated);
-      });
-      
-      // Then update availableRooms (which is filtered allRooms)
-      setAvailableRooms(prev => {
-        // Check if the room exists
-        const roomExists = prev.some(room => room.id === msgRoomId);
-        debugLog(`Room ${msgRoomId} exists in availableRooms: ${roomExists}`);
-        console.log(`🔍 Room ${msgRoomId} exists in availableRooms: ${roomExists}`);
-        
-        let updated;
-        if (roomExists) {
-          updated = prev.map(room => {
-            if (room.id === msgRoomId) {
-              const newState = {
-                ...room,
-                lastMessage: message.content,
-                active: true,
-                lastActivityTimestamp: message.timestamp || now,
-                unread: activeRoom?.id !== msgRoomId
-              };
-              debugLog("Updated room in availableRooms:", room.id);
-              console.log("✅ Updated room in availableRooms:", room.id);
-              return newState;
-            }
-            return room;
-          });
-        } else {
-          // Check if we should add this to available rooms
-          const isActiveRoom = activeRoom?.id === msgRoomId;
-          if (!isActiveRoom) {
-            debugLog("Room not found in availableRooms, creating placeholder");
-            console.log("🆕 Room not found in availableRooms, creating placeholder");
-            const newRoom = {
-              id: msgRoomId,
-              userName: message.senderName || "User",
-              lastMessage: message.content,
-              active: true,
-              lastActivityTimestamp: message.timestamp || now,
-              unread: true
-            };
-            updated = [...prev, newRoom];
-          } else {
-            updated = prev;
-          }
-        }
-        
-        return filterActiveRooms(updated);
-      });
-      
-      // Always play notification for incoming user messages
-      if (message.role === 'user' && message.senderId !== newSocket.id) {
-        console.log("🔊 Playing notification sound for user message");
-        debugLog("Playing notification for message from:", message.senderId);
-        
-        // Play sound for all messages not from current user
-        if (notificationSound) {
-          try {
-            notificationSound.play().catch(err => {
-              console.warn("Failed to play notification sound:", err);
-            });
-          } catch (err) {
-            console.warn("Error playing notification sound:", err);
-          }
-        }
-        
-        // Show browser notification if we have permission and window is not focused
-        if (Notification.permission === "granted" && !document.hasFocus()) {
-          try {
-            const notification = new Notification("New Message", {
-              body: `${message.senderName || 'User'}: ${message.content?.substring(0, 60)}...`,
-              icon: "/favicon.ico",
-            });
-            
-            notification.onclick = () => {
-              window.focus();
-              notification.close();
-            };
-            
-            debugLog("Browser notification shown for message");
-            console.log("🔔 Browser notification shown");
-          } catch (err) {
-            console.warn("Failed to show notification:", err);
-          }
-        }
       }
     });
 
@@ -662,7 +401,7 @@ const Agent = () => {
     if (!input.trim() || !activeRoom) return;
 
     console.log(`Agent: Sending message to room ${activeRoom.id}`);
-
+    
     const message = {
       content: input,
       role: "agent",
@@ -686,40 +425,8 @@ const Agent = () => {
   const joinRoom = (room) => {
     if (socket) {
       console.log(`Agent: Joining room ${room.id}`);
-      
-      // Immediately mark room as active in local state
-      setAllRooms(prev => {
-        return prev.map(r => {
-          if (r.id === room.id) {
-            return { ...r, active: true };
-          }
-          return r;
-        });
-      });
-      
-      setAvailableRooms(prev => {
-        const updated = prev.map(r => {
-          if (r.id === room.id) {
-            return { ...r, active: true };
-          }
-          return r;
-        });
-        return filterActiveRooms(updated);
-      });
-      
-      // Tell server to join the room
-      socket.emit("join_room", { 
-        roomId: room.id, 
-        agentId: socket.id,
-        markActive: true // Tell server to mark this room as active
-      });
-      
-      // Update the active room locally
-      setActiveRoom({
-        ...room,
-        active: true,
-        lastActivityTimestamp: new Date().toISOString()
-      });
+      socket.emit("join_room", { roomId: room.id, agentId: socket.id });
+      setActiveRoom(room);
       
       // Request chat history for this room
       socket.emit("get_chat_history", { roomId: room.id });
@@ -734,53 +441,13 @@ const Agent = () => {
       setActiveRoom(null);
       setMessages([]);
       
-      // Mark room as inactive in our local state
-      setAllRooms(prev => {
-        return prev.map(room => {
-          if (room.id === activeRoom.id) {
-            return { 
-              ...room, 
-              active: false,
-              lastActivityTimestamp: new Date().toISOString() 
-            };
-          }
-          return room;
-        });
+      // Then notify server
+      socket.emit("leave_room", { 
+        roomId: activeRoom.id, 
+        agentId: socket.id,
+        reason: reason,
+        agentName: agent?.agentName || "Support Agent"
       });
-      
-      // Update available rooms - filter out this now inactive room
-      setAvailableRooms(prev => {
-        const updated = prev.map(room => {
-          if (room.id === activeRoom.id) {
-            return { 
-              ...room, 
-              active: false,
-              lastActivityTimestamp: new Date().toISOString() 
-            };
-          }
-          return room;
-        });
-        return filterActiveRooms(updated);
-      });
-      
-      // Then notify server to close or mark inactive
-      if (reason === 'manual_exit' || reason === 'inactivity_timeout' || reason === 'agent_logout') {
-        // Close the conversation completely
-        socket.emit("close_room", { 
-          roomId: activeRoom.id, 
-          agentId: socket.id,
-          reason: reason,
-          agentName: agent?.agentName || "Support Agent"
-        });
-      } else {
-        // Just mark as inactive and leave
-        socket.emit("leave_room", { 
-          roomId: activeRoom.id, 
-          agentId: socket.id,
-          reason: reason,
-          agentName: agent?.agentName || "Support Agent"
-        });
-      }
 
       // Show notification
       const Toast = Swal.mixin({
@@ -891,7 +558,7 @@ const Agent = () => {
     // Logout the agent (updates DB status to offline)
     console.log("Agent: Calling logout API");
     try {
-    await logout();
+      await logout();
       console.log("Agent: Logout successful");
     } catch (error) {
       console.error("Agent: Error during logout:", error);
@@ -904,12 +571,8 @@ const Agent = () => {
 
   // Play notification sound based on settings
   const playNotificationSound = () => {
-    if (!notificationsEnabled) {
-      debugLog("Notifications disabled, not playing sound");
-      return;
-    }
+    if (!notificationsEnabled) return;
     
-    debugLog("Playing notification sound");
     let soundToPlay;
     
     // Set the source based on selected sound
@@ -931,7 +594,7 @@ const Agent = () => {
     audio.volume = notificationVolume / 100;
     
     audio.play().catch(error => {
-      debugLog("Error playing notification sound:", error);
+      console.error("Error playing notification sound:", error);
     });
   };
 
@@ -962,17 +625,6 @@ const Agent = () => {
   useEffect(() => {
     requestNotificationPermission();
   }, []);
-
-  // Toggle between showing active conversations and all conversations
-  const toggleConversationView = () => {
-    setShowAllConversations(!showAllConversations);
-  };
-
-  // Add this debug function near the top of the component
-  const debugLog = (message, data = null) => {
-    const timestamp = new Date().toLocaleTimeString();
-    console.log(`[${timestamp}] ${message}`, data || '');
-  };
 
   return (
     <div className="flex h-screen bg-gray-900">
@@ -1163,21 +815,10 @@ const Agent = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-3">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="text-sm font-semibold text-gray-400">
-              {showAllConversations ? "ALL CONVERSATIONS" : "ACTIVE CONVERSATIONS"}
-            </h3>
-            <button 
-              onClick={toggleConversationView}
-              className="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded text-blue-300"
-            >
-              {showAllConversations ? "Show Active" : "View All"}
-            </button>
-          </div>
-          
-          {(showAllConversations ? allRooms : availableRooms).length > 0 ? (
+          <h3 className="text-sm font-semibold text-gray-400 mb-2">ACTIVE SUPPORT REQUESTS</h3>
+          {availableRooms.length > 0 ? (
             <div className="space-y-2">
-              {(showAllConversations ? allRooms : availableRooms).map((room) => (
+              {availableRooms.map((room) => (
                 <button
                   key={room.id}
                   onClick={() => joinRoom(room)}
@@ -1189,29 +830,20 @@ const Agent = () => {
                 >
                   <div className="flex justify-between items-center">
                     <span className="font-medium text-gray-200">{room.userName || "Customer"}</span>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      room.active 
-                        ? "bg-green-800 text-green-200" 
-                        : "bg-gray-600 text-gray-300"
-                    }`}>
-                      {room.active ? (room.waitTime || "Active") : "Inactive"}
+                    <span className="text-xs bg-green-800 text-green-200 px-2 py-1 rounded-full">
+                      {room.waitTime || "New"}
                     </span>
                   </div>
                   <p className="text-xs text-gray-400 mt-1 truncate">
                     {room.lastMessage || "Waiting for assistance..."}
                   </p>
-                  {room.lastActivityTimestamp && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      {new Date(room.lastActivityTimestamp).toLocaleTimeString()}
-                    </p>
-                  )}
                 </button>
               ))}
             </div>
           ) : (
             <div className="text-center p-6 text-gray-500">
               <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>No {showAllConversations ? "" : "active"} support requests</p>
+              <p>No active support requests</p>
             </div>
           )}
         </div>

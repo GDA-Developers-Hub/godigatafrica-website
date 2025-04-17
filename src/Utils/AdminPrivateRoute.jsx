@@ -121,7 +121,7 @@ const AdminPrivateRoute = () => {
     </div>;
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/amin/login" state={{ from: location }} replace />;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/admin/login" state={{ from: location }} replace />;
 };
 
 export default AdminPrivateRoute;

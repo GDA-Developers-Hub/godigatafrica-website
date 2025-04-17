@@ -145,16 +145,16 @@ function NewsLetterAdmin() {
       ${
         includeSocialLinks
           ? `<div style="margin-bottom: 20px;">
-            <a href="https://facebook.com/company" style="margin: 0 12px; text-decoration: none;">
+            <a href="https://web.facebook.com/AfricaGoDigital" style="margin: 0 12px; text-decoration: none;">
                 <img src="https://img.icons8.com/color/48/facebook.png" alt="Facebook" style="width: 24px; height: 24px;">
             </a>
-            <a href="https://twitter.com/company" style="margin: 0 12px; text-decoration: none;">
+            <a href="https://x.com/GoAfricadigital" style="margin: 0 12px; text-decoration: none;">
                 <img src="https://img.icons8.com/color/48/twitter.png" alt="Twitter" style="width: 24px; height: 24px;">
             </a>
-            <a href="https://instagram.com/company" style="margin: 0 12px; text-decoration: none;">
+            <a href="https://www.instagram.com/godigitalafrica.ke" style="margin: 0 12px; text-decoration: none;">
                 <img src="https://img.icons8.com/color/48/instagram-new.png" alt="Instagram" style="width: 24px; height: 24px;">
             </a>
-            <a href="https://linkedin.com/company" style="margin: 0 12px; text-decoration: none;">
+            <a href="https://www.linkedin.com/company/godigitalafrica" style="margin: 0 12px; text-decoration: none;">
                 <img src="https://img.icons8.com/color/48/linkedin.png" alt="LinkedIn" style="width: 24px; height: 24px;">
             </a>
             </div>`

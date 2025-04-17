@@ -25,8 +25,8 @@ import {
 } from "lucide-react";
 import Toggle from "../../Utils/ToogleButton";
 import logo from "../../assets/logo.png";
-import logofv from "../../assets/Partners/wix.png";
-import skill from "../../assets/Partners/safaricom.jpeg";
+import logofv from "../../assets/Partners/image.png";
+import skill from "../../assets/skill-link-logo.png";
 import adcraft from "../../assets/adcraft.jpg";
 
 // ClassNames component to replace the cn utility function
@@ -385,11 +385,11 @@ const Navbar = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-30">
                   {partnersList.map((partner, index) => (
-                    <div key={index} className="flex flex-col items-center">
+                    <div key={index} className="flex flex-col items-center w-[350px] bg-white rounded p-1">
                       <img 
                         src={partner.logo} 
                         alt={partner.name} 
-                        className="mb-2 w-full max-w-xs h-[100px] rounded"
+                        className="mb-2 w-[250px] h-[100px] rounded"
                       />
                       <span className="text-white font-medium">{partner.name}</span>
                     </div>

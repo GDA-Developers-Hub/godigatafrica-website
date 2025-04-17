@@ -7,11 +7,11 @@ import { Home, Star, FileSearch, Mail } from "lucide-react";
 import { motion, useInView, useAnimation } from "framer-motion";
 import meta from "../../assets/meta.png";
 import tiktok from "../../assets/tiktok.png";
-import google from "../../assets/Partners/oracle.jpeg";
+import google from "../../assets/google-partner-no-bg.jpg";
 import OpenAi from "../../assets/openai.webp";
 import SocialIcons from "../Utils/SocialIcons";
 import { BASE_URL } from "../../Utils/BaseUrl";
-import kenya from "../../assets/Partners/nationalmediagroup.jpeg";
+import kenya from "../../assets/kenya-flag.webp";
 
 const Footer = () => {
   const [email, setEmail] = useState("");

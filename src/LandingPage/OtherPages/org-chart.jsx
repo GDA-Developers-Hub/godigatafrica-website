@@ -34,11 +34,11 @@ export default function OrganizationalChartV3() {
       console.error("Failed to fetch team data:", err)
       setError("Failed to load organization data. Please try again.")
       
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Failed to load organization chart data',
-      })
+      // Swal.fire({
+      //   icon: 'error',
+      //   title: 'Error',
+      //   text: 'Failed to load organization chart data',
+      // })
     } finally {
       setIsLoading(false)
     }
