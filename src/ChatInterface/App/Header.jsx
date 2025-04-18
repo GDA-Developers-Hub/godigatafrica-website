@@ -20,7 +20,7 @@ const Header = () => {
           <div>
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Go Digital</h1>
             <p className="text-sm text-gray-800 dark:text-white opacity-75">
-              Software Solutions Assistant
+              Digital Marketing Solutions Assistant
             </p>
           </div>
         </div>

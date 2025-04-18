@@ -26,13 +26,14 @@ export function ChatInterface() {
 
   // Predefined prompts (for context suggestions)
   const predefinedPrompts = [
-    "What strategies can improve my website's conversion rates?",
-    "How do I implement responsive design for my website?",
-    "What digital marketing tactics are most effective for small businesses?",
-    "How can I optimize my website for SEO and load speed?",
-    "What are the best practices for website security?",
-    "How do I integrate social media into my digital marketing strategy?"
+    "How can I improve my website's SEO to rank higher on Google?",
+    "What are the best practices for redesigning a corporate website?",
+    "How can paid social advertising help grow my business online?",
+    "What strategies boost website speed and overall user experience?",
+    "How do I secure my website and protect it from cyber threats?",
+    "What’s the best way to integrate social media marketing into my digital strategy?"
   ];
+  
   const promptIcons = [
     Icons.trendingUp,
     Icons.smartphone,

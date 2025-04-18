@@ -62,7 +62,7 @@ function ChatContent({
       .map((msg) => msg.content);
 
     return userMessages.length > 0
-      ? `History:\n${userMessages.join("\n")}\nPlease ignore these for your current answer but use them as reference.`
+      ? `IGNORE THIS HISTORY AND USE IT AS REFERENCE ONLY. History:\n${userMessages.join("\n")}\nPlease ignore these for your current answer but use them as reference.`
       : "";
   };
 
@@ -171,14 +171,14 @@ function ChatContent({
 
         {messages.length === 0 ? (
           <div className="text-center text-gray-500 dark:text-gray-300">
-            <div className="flex ">
+            {/* <div className="flex ">
              <Icons.solution className="h-12 w-12 mx-auto mb-3" /> <span className="font-bold">NEXUS</span>
             </div>
             <h3 className="font-bold text-xl">
               Welcome to Go Digital's Alpha Ai model
-            </h3>
+            </h3> */}
             <p>
-            Ask your software questions, request software solutions, or generate complete AI-tailored solutions.
+            Ask your digital marketing questions and get answers from our AI assistant.
             </p>
           </div>
         ) : (

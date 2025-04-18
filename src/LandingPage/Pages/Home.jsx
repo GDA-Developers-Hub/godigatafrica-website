@@ -18,6 +18,8 @@ import rwanda from "../../assets/rwanda.jpg";
 import tanzania from "../../assets/tanzania.jpg";  
 import senegal from "../../assets/senegal.jpeg";
 import ghana from "../../assets/ghana.jpg";
+import zambia from "../../assets/zambia.jpg";
+import djibouti from "../../assets/djibouti.jpg";
 
 // Flag images
 import somaliaFlag from "../../assets/somalia-flag.webp";
@@ -25,9 +27,11 @@ import ethiopiaFlag from "../../assets/ethiopia-flag.webp";
 import kenyaFlag from "../../assets/kenya-flag.webp";
 import dubaiFlag from "../../assets/uae-flag.webp";
 import rwandaFlag from "../../assets/rwanda-flag.webp";
-import tanzaniaFlag from "../../assets/tanzania-flag.jpg";  
+import tanzaniaFlag from "../../assets/tz.webp";  
 import senegalFlag from "../../assets/senegal-flag.webp";
 import ghanaFlag from "../../assets/ghana-flag.webp";
+import zambiaFlag from "../../assets/zm.webp";
+import djiboutiFlag from "../../assets/dj.webp";
 
 // Card data for carousel
 const cards = [
@@ -73,9 +77,10 @@ export default function Home() {
   const backgroundSliderRef = useRef(null);
 
   // Image arrays
-  const backgroundImages = [kenya, somalia, dubai, ethiopia, rwanda, tanzania, senegal, ghana];
-  const flagImages = [kenyaFlag, somaliaFlag, dubaiFlag, ethiopiaFlag, rwandaFlag, tanzaniaFlag, senegalFlag, ghanaFlag];
-  const countryNames = ["Kenya", "Somalia", "UAE", "Ethiopia", "Rwanda", "Tanzania", "Senegal", "Ghana"];
+  const backgroundImages = [kenya, somalia, dubai, ethiopia, rwanda, tanzania, senegal, ghana, zambia, djibouti];
+  const flagImages = [kenyaFlag, somaliaFlag, dubaiFlag, ethiopiaFlag, rwandaFlag, tanzaniaFlag, senegalFlag, ghanaFlag, zambiaFlag, djiboutiFlag];
+  const countryNames = ["Kenya", "Somalia", "UAE", "Ethiopia", "Rwanda", "Tanzania", "Senegal", "Ghana", "Zambia", "Djibouti"];
+
 
   // Mouse movement effect for background parallax
   useEffect(() => {
