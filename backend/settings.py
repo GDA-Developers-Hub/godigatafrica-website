@@ -48,10 +48,10 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-
 ALLOWED_HOSTS = [
-    'godigitalafrica.com'
-]
+     'godigatafrica-website-production.up.railway.app',
+     'godigitalafrica.com'
+ ]
 
 
 
