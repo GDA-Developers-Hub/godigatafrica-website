@@ -50,11 +50,6 @@ logger = logging.getLogger(__name__)
 
 
 ALLOWED_HOSTS = [
-    'godigatafrica-website-production.up.railway.app',
-    'server-628309.hostingwithgda.com', 
-    '127.0.0.1', 
-    'localhost', 
-    'hostingwithgda.com'
     'godigitalafrica.com'
 ]
 
@@ -71,8 +66,6 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "https://godigatafrica-website-production.up.railway.app",
     "https://go-digital-africa-production.up.railway.app",
-    "http://hostingwithgda.com/website/",
-    "https://hostingwithgda.com",
     "https://godigitalafrica.com/",
 ]
 
@@ -86,8 +79,6 @@ CORS_ALLOW_HEADERS = ["*"]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5174",
-    "https://hostingwithgda.com",
-    "http://hostingwithgda.com/website/",
     "https://godigatafrica-website-production.up.railway.app",
     "https://godigitalafrica.com/",
 ]
