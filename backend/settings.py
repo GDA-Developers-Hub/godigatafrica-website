@@ -290,7 +290,7 @@ FORCE_SCRIPT_NAME = '/django'
 STATIC_URL = '/django/static/'
 
 # Frontend URL
-FRONTEND_URL = "https://hostingwithgda.com/website/"
+FRONTEND_URL = "https://godigitalafrica.com"
 
 
 MEDIA_URL = '/media/'
